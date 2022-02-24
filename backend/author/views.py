@@ -86,3 +86,8 @@ class GetAuthorApiView(GenericAPIView):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetAuthorFollowersApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+
+    def get(self, request, user_id):
+        pass
