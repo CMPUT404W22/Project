@@ -13,26 +13,14 @@ class FollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
     def get(self, request, *args, **kwargs):
-        #followers = Following.objects.filter(following=request.user)
-        followers = Following.objects.filter(following=1)
-        list = []
-        print("RAN GET")
-        for e in followers:
-            list.append(e)
-        return HttpResponse(list)
-        #return response.Response(str(followers), status.HTTP_200_OK)
+        pass
 
     def delete(self, request, *args, **kwargs):
         # remove FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID
-        record = Following.objects.get(id=kwargs["foreign_author_id"])
-        record.delete()
-        return response.Response("Deleted", status.HTTP_200_OK)
+        pass
 
     def put(self, request, *args, **kwargs):
-        # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
-        author_obj = Author.objects.get()
-        record = Following.objects.create(author = kwargs["foreign_author_id"], following = request.user)
-        return response.Response("Added", status.HTTP_200_OK)
+        pass
 
     def get(self, request, *args, **kwargs):
         pass
