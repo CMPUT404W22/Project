@@ -1,9 +1,13 @@
 import json
+import os
+import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 
 class MyUserManager(UserManager):
@@ -24,10 +28,12 @@ class MyUserManager(UserManager):
 
 
 class Author(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField(_('username'), max_length=150, blank=False, null=False, unique=True)
-    first_name = models.CharField(_('first name'), max_length=150, blank=False, null=False)
-    last_name = models.CharField(_('last name'), max_length=150, blank=False, null=False)
-    profile_header = models.TextField(_('profile header'), max_length=400, null=True, blank=True)
+    display_name = models.CharField(_('display name'), max_length=150, blank=False, null=False)
+    github = models.CharField(_('github'), max_length=150, blank=False, null=False)
+    image = models.CharField(_('profile image'), max_length=300, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(blank=False, null=False, default=True)
@@ -43,3 +49,14 @@ class Author(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         # created = not self.pk
         super().save(*args, **kwargs)
+
+    def toJson(self):
+        return {
+            "type": "author",
+            "id": f"http://127.0.0.1:8000/authors/{self.id}",
+            "url": f"http://127.0.0.1:8000/authors/{self.id}",
+            "host": "http://127.0.0.1:8000/",
+            "displayName": self.display_name,
+            "github": self.github,
+            "profileImage": self.image
+        }
