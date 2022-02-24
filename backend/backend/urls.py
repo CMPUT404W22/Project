@@ -22,12 +22,12 @@ from backend import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('author/', include("author.urls")),
-    path('comment/', include("comment.urls")),
-    path('following/', include("following.urls")),
-    path('image/', include("image.urls")),
-    path('like/', include("like.urls")),
-    path('notification/', include("notification.urls")),
-    path('post/', include("post.urls")),
+    path('service/authors/', include("author.urls")),
+    path('service/comment/', include("comment.urls")),
+    path('service/following/', include("following.urls")),
+    path('service/image/', include("image.urls")),
+    path('service/like/', include("like.urls")),
+    path('service/notification/', include("notification.urls")),
+    path('service/post/', include("post.urls")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

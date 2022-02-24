@@ -3,6 +3,8 @@ from django.urls import path
 from author import views
 
 urlpatterns = [
-    path('register/', views.Register.as_view(), name="register"),
-    path('profile/<str:username>/', views.Authors.as_view(), name="authors"),
+    # path('register/', views.Register.as_view(), name="register"),
+    path('', views.GetAuthorsApiView.as_view(), name="authors"),
+    path('<str:user_id>/', views.GetAuthorApiView.as_view(), name="authors"),
+
 ]
