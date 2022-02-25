@@ -7,6 +7,7 @@ class Following(models.Model):
     author = models.ForeignKey(Author, blank=False, null=False, on_delete=models.CASCADE, related_name='follower')
     following = models.ForeignKey(Author, blank=False, null=False, on_delete=models.CASCADE, related_name='following')
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    objects = models.Manager()
 
     class Meta:
         unique_together = ('author', 'following',)
@@ -19,3 +20,5 @@ class Following(models.Model):
 
     def __str__(self):
         return f"{self.author} is following ({self.following})"
+
+
