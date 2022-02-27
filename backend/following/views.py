@@ -1,34 +1,44 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from .models import Following
 from django.views import generic
+from rest_framework import response, status
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.generics import GenericAPIView
+from following.models import Following
 
-class IndexView(generic.ListView):
-    #template_name = 'polls/index.html'
-    #context_object_name = 'latest_question_list'
 
-    def get_queryset(self):
-        """Return the last five published questions."""
-        return Following.objects.order_by('following')
+class FollowersApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
 
-class DetailView(generic.DetailView):
-    model = Following
-    template_name = 'polls/detail.html'
+    def get(self, request, *args, **kwargs):
+        pass
 
-# Create your views here.
-def getFollowers():
-    # 'service/authors/{AUTHOR_ID}/followers/'
-    pass
+    def delete(self, request, *args, **kwargs):
+        # remove FOREIGN_AUTHOR_ID as a follower of AUTHOR_ID
+        pass
 
-def getFollowing(author_id):
-    following = Following.objects.get(author=author_id)
-    return following.following
-    # 'service/authors/{AUTHOR_ID}/following/'
+    def put(self, request, *args, **kwargs):
+        pass
 
-def addFollower():
+    def get(self, request, *args, **kwargs):
+        pass
+
+class FollowingApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+
+    def get(self, request):
+        pass
+
+def test(request, author_username):
+    followers = Following.objects.all()
+    return HttpResponse(str(followers))
+
+def addFollower(request):
     # 'service/authors/{AUTHOR_ID}/addFollower/'
     pass
 
-def removeFollower():
+def removeFollower(request):
     # 'service/authors/{AUTHOR_ID}/removeFollower/'
     pass
 

@@ -1,10 +1,10 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
-import json
-from author.models import MyUserManager, Author
+
+from author.models import Author
+from following.models import Following
 
 '''
 class Register(GenericAPIView):
@@ -90,4 +90,37 @@ class GetAuthorFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
     def get(self, request, user_id):
-        pass
+        followers = Following.objects.filter(following=user_id)
+
+        result = {
+            "type": "followers",
+            "items": [follower.author.toJson() for follower in followers]
+        }
+
+        return response.Response(result, status.HTTP_200_OK)
+
+    def delete(self, request, user_id, foreign_user_id):
+        # remove FOREIGN_AUTHOR_ID as a follower of AUTHORs_ID
+        follower = Author.objects.get(id=foreign_user_id)
+        author = Author.objects.get(id=user_id)
+        record = Following.objects.get(author=follower, following=author)
+        record.delete()
+        return response.Response("Deleted", status.HTTP_200_OK)
+
+    def put(self, request, user_id, foreign_user_id):
+        # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
+        author = Author.objects.get(id=user_id)
+        follower = Author.objects.get(id=foreign_user_id)
+        Following.objects.create(author=follower, following=author)
+        return response.Response("Added", status.HTTP_200_OK)
+
+    def get(self, request, user_id, foreign_user_id):
+        # check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
+        author = Author.objects.get(id=user_id)
+        followers = Following.objects.filter(following=author)
+        if followers:
+            for follower in followers:
+                if follower.id == foreign_user_id:
+                    return response.Response("True", status.HTTP_200_OK)
+
+        return response.Response("False", status.HTTP_200_OK)
