@@ -22,7 +22,7 @@ class GetPostsApiView(GenericAPIView):
             size = 10
             try:
                 size = request.queryparams["size"]
-            except Exception as :
+            except Exception as _:
                 pass
 
             paginator = Paginator(post, size)

@@ -25,7 +25,7 @@ urlpatterns = [
     path('service/authors/', include("author.urls")),
     path('service/comment/', include("comment.urls")),
     path('service/following/', include("following.urls")),
-    path('service/image/', include("image.urls")),
+    # path('service/image/', include("image.urls")),
     path('service/like/', include("like.urls")),
     path('service/notification/', include("notification.urls")),
     path('service/authors/<str:user_id>/posts', include("post.urls")),
