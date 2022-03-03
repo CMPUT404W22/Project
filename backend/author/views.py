@@ -27,7 +27,7 @@ class GetAuthorsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
     def get(self, request):
-        users = Author.objects.filter(is_staff=False)
+        users = Author.objects.all()
 
         if len(request.query_params) != 0:
             page = request.query_params["page"]
@@ -60,7 +60,7 @@ class GetAuthorApiView(GenericAPIView):
 
     def get(self, request, user_id):
         try:
-            user = Author.objects.get(id=user_id, is_staff=False)
+            user = Author.objects.get(id=user_id)
 
             return response.Response(user.toJson(), status=status.HTTP_200_OK)
         except Exception as e:
