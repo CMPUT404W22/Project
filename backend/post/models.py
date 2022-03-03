@@ -7,7 +7,6 @@ from django.db.models import CharField, Model
 from django_mysql.models import ListCharField
 
 
-
 class Visibility(models.IntegerChoices):
     PUBLIC = 0, 'Public'
     FRIENDS = 1, 'Friends'
