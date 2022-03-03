@@ -28,6 +28,6 @@ urlpatterns = [
     path('service/image/', include("image.urls")),
     path('service/like/', include("like.urls")),
     path('service/notification/', include("notification.urls")),
-    path('service/post/', include("post.urls")),
+    path('service/authors/<str:user_id>/posts', include("post.urls")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
