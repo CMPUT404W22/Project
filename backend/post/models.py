@@ -1,7 +1,3 @@
-from asyncio.windows_events import NULL
-from email.policy import default
-import json
-import os
 import uuid
 
 from django.db import models
@@ -38,7 +34,7 @@ class Post(models.Model):
     count = models.IntegerField(default=0)
     unlisted = models.BooleanField(default=False)
     categories = ListCharField(
-        default=NULL,
+        null=True,
         base_field=CharField(max_length=10),
         size=6,
         max_length=(6 * 11),  # 6 * 10 character nominals, plus commas
@@ -59,6 +55,7 @@ class Post(models.Model):
             "author": self.get_author().toJson(),
             "categories": self.categories,
             "count": self.count,
+            "comments": f'http://127.0.0.1:8000/authors/{self.author.id}/posts/{self.id}/comments',
             "published": self.updated,
             "visibility": self.visibility,
             "unlisted": self.unlisted

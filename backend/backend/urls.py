@@ -23,7 +23,7 @@ from backend import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('service/authors/', include("author.urls")),
-    path('service/comment/', include("comment.urls")),
+    path('service/authors/<str:user_id>/posts/<str:post_id>/comments/', include("comment.urls")),
     path('service/following/', include("following.urls")),
     # path('service/image/', include("image.urls")),
     path('service/like/', include("like.urls")),
