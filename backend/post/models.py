@@ -48,16 +48,13 @@ class Post(models.Model):
         # print(self.author)
         return Author.objects.get(id=self.author.id)
 
-    def str(self):
-        return f"{self.author} | {self.content}"
-
     def toJson(self):
         return {
             "type": "post",
             "title": self.title,
-            "id": f"http://127.0.0.1:8000/authors/%7Bself.author.id%7D/posts/%7Bself.id%7D",
+            "id": f'http://127.0.0.1:8000/authors/{self.author.id}/posts/{self.id}',
             "description": self.description,
-            "contentType":"text/plain",
+            "contentType":self.type,
             "content": self.content,
             "author": self.get_author().toJson(),
             "categories": self.categories,

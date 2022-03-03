@@ -1,8 +1,4 @@
-from hashlib import new
-from turtle import pos
-from django.shortcuts import render
 from django.core.paginator import Paginator
-from sympy import re
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
@@ -47,14 +43,12 @@ class GetPostsApiView(GenericAPIView):
         try:
             post = Post.objects.create(author = author)
             title = request.data["title"]
-            # print(title)
             description = request.data["description"]
             content = request.data["content"]
             visibility = request.data["visibility"]
             categories = request.data["categories"]
             count = request.data["count"]
             unlisted = request.data["unlisted"]
-            # type = request.data["contentType"]
 
             post.title = title
             post.description = description
@@ -63,8 +57,54 @@ class GetPostsApiView(GenericAPIView):
             post.categories = categories
             post.count = count
             post.unlisted = unlisted
-            # print(post.title)
             post.save()
+            
             return response.Response(post.toJson(), status=status.HTTP_201_CREATED)
         except Exception:
             return response.Response("Error", status=status.HTTP_400_BAD_REQUEST)
+
+class GetPostApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+
+    def get(self, request, user_id, post_id):
+        try:
+            post = Post.objects.get(id = post_id)
+            return response.Response(post.toJson(), status=status.HTTP_200_OK)
+        except Exception as e:
+            return response.Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, user_id, post_id):
+        try:
+            if str(request.user.id) == user_id:
+
+                title = request.data["title"]
+                description = request.data["description"]
+                content = request.data["content"]
+                visibility = request.data["visibility"]
+                categories = request.data["categories"]
+                count = request.data["count"]
+                unlisted = request.data["unlisted"]
+
+                post = Post.objects.get(id=post_id)
+                post.title = title
+                post.description = description
+                post.content = content
+                post.visibility = visibility
+                post.categories = categories
+                post.count = count
+                post.unlisted = unlisted
+                post.save()
+
+                return response.Response(post.toJson(), status=status.HTTP_204_NO_CONTENT)
+            else:
+                return response.Response(status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, user_id, post_id):
+        try:
+            post = Post.objects.get(id=post_id)
+            post.delete()
+            return response.Response("Deleted", status.HTTP_200_OK)
+        except Exception:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
