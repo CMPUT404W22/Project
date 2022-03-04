@@ -64,7 +64,7 @@ class EditFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response("Error while trying to get followers", status=status.HTTP_400_BAD_REQUEST)
 
-
+# TODO: delete if unused
 class GetFollowingApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
@@ -82,7 +82,7 @@ class GetFollowingApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
-
+# TODO: delete if unused
 class EditFollowingApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
@@ -107,26 +107,3 @@ class EditFollowingApiView(GenericAPIView):
         except Exception as e:
             return response.Response("Error while trying to add", status=status.HTTP_404_NOT_FOUND)
 
-def test(request, author_username):
-    followers = Following.objects.all()
-    return HttpResponse(str(followers))
-
-
-def addFollower(request):
-    # 'service/authors/{AUTHOR_ID}/addFollower/'
-    pass
-
-
-def removeFollower(request):
-    # 'service/authors/{AUTHOR_ID}/removeFollower/'
-    pass
-
-
-def addFollowing():
-    # 'service/authors/{AUTHOR_ID}/addFollowing/'
-    pass
-
-
-def removeFollowing():
-    # 'service/authors/{AUTHOR_ID}/removeFollowing/'
-    pass
