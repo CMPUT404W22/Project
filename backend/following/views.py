@@ -4,12 +4,13 @@ from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 from author.models import Author
+from author.serializer import AuthorSerializer
 from following.models import Following
 
 
 class GetFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
-
+    serializer_class = AuthorSerializer
     def get(self, request, user_id):
         # gets a list of authors who are user_id's followers
         try:
@@ -17,7 +18,7 @@ class GetFollowersApiView(GenericAPIView):
             followers = Following.objects.filter(following=author)
             result = {
                 "type": "followers",
-                "items": [follower.author.toJson() for follower in followers]
+                "items": AuthorSerializer(followers, many=True)
             }
             return response.Response(result, status.HTTP_200_OK)
 
@@ -27,6 +28,7 @@ class GetFollowersApiView(GenericAPIView):
 
 class EditFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = AuthorSerializer
 
     def delete(self, request, user_id, foreign_user_id):
         # remove FOREIGN_AUTHOR_ID as a follower of AUTHORs_ID
@@ -35,7 +37,7 @@ class EditFollowersApiView(GenericAPIView):
             author = Author.objects.get(id=user_id)
             record = Following.objects.get(author=follower, following=author)
             record.delete()
-            return response.Response("Deleted", status.HTTP_200_OK)
+            return response.Response("Deleted", status.HTTP_202_ACCEPTED)
         except Exception as e:
             return response.Response(f"Error while trying to delete: {e}", status=status.HTTP_404_NOT_FOUND)
 
@@ -45,7 +47,7 @@ class EditFollowersApiView(GenericAPIView):
             author = Author.objects.get(id=user_id)
             follower = Author.objects.get(id=foreign_user_id)
             Following.objects.create(author=follower, following=author)
-            return response.Response("Added", status.HTTP_200_OK)
+            return response.Response("Added", status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Error while trying to add: {e}", status=status.HTTP_404_NOT_FOUND)
 
@@ -62,9 +64,11 @@ class EditFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
 
+
 # TODO: delete if unused
 class GetFollowingApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = AuthorSerializer
 
     def get(self, request, user_id):
         # gets a list of authors who are user_id's followers
@@ -83,6 +87,7 @@ class GetFollowingApiView(GenericAPIView):
 # TODO: delete if unused
 class EditFollowingApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = AuthorSerializer
 
     def delete(self, request, user_id, foreign_user_id):
         # remove FOREIGN_AUTHOR_ID as a follower of AUTHORs_ID
