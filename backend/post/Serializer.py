@@ -19,7 +19,7 @@ class PostSerializer(serializers.ModelSerializer):
         representation['description'] = instance.description
         representation['contentType'] = instance.type
         representation['content'] = instance.content
-        representation['author'] = AuthorSerializer(instance.get_author(), many=False)
+        representation['author'] = AuthorSerializer(instance.get_author(), many=False).data
         representation['categories'] = instance.categories
         representation['count'] = Comment.objects.filter(post=instance).count()
         representation['comments'] = f'http://127.0.0.1:8000/authors/{instance.author.id}/posts/{instance.id}/comments'

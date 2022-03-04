@@ -69,7 +69,6 @@ class GetAuthorApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
-    @staticmethod
     def post(self, request, user_id):
         try:
             if str(request.user.id) == user_id or request.user.is_staff:

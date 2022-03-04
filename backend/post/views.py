@@ -41,7 +41,6 @@ class GetPostsApiView(GenericAPIView):
 
             return response.Response(result, status=status.HTTP_200_OK)
 
-    @staticmethod
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
@@ -72,7 +71,6 @@ class GetPostApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
     serializer_class = PostSerializer
 
-    @staticmethod
     def get(self, request, user_id, post_id):
         try:
             post = Post.objects.get(id=post_id)
@@ -82,7 +80,6 @@ class GetPostApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
-    @staticmethod
     def post(self, request, user_id, post_id):
         try:
             if str(request.user.id) == user_id:
@@ -111,7 +108,6 @@ class GetPostApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @staticmethod
     def delete(self, request, user_id, post_id):
         try:
             post = Post.objects.get(id=post_id)
