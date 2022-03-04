@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from author.Serializer import AuthorSerializer
+from author.serializer import AuthorSerializer
 from comment.models import Comment
 from post.models import Post
 

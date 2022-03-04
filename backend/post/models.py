@@ -40,20 +40,3 @@ class Post(models.Model):
 
     def get_author(self):
         return Author.objects.get(id=self.author.id)
-
-    '''def toJson(self):
-        return {
-            "type": "post",
-            "title": self.title,
-            "id": f'http://127.0.0.1:8000/authors/{self.author.id}/posts/{self.id}',
-            "description": self.description,
-            "contentType": self.type,
-            "content": self.content,
-            "author": self.get_author().toJson(),
-            "categories": self.categories,
-            "count": self.count,
-            "comments": f'http://127.0.0.1:8000/authors/{self.author.id}/posts/{self.id}/comments',
-            "published": self.updated,
-            "visibility": self.visibility,
-            "unlisted": self.unlisted
-        }'''

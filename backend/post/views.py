@@ -4,7 +4,7 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 
 from author.models import Author
-from post.Serializer import PostSerializer
+from post.serializer import PostSerializer
 from post.models import Post
 
 
@@ -58,7 +58,6 @@ class GetPostsApiView(GenericAPIView):
             post.content = content
             post.visibility = visibility
             post.categories = categories
-            post.count = count
             post.unlisted = unlisted
             post.save()
 
@@ -98,7 +97,6 @@ class GetPostApiView(GenericAPIView):
                 post.content = content
                 post.visibility = visibility
                 post.categories = categories
-                post.count = count
                 post.unlisted = unlisted
                 post.save()
 

@@ -3,9 +3,8 @@ from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 
-from author.Serializer import AuthorSerializer
+from author.serializer import AuthorSerializer
 from author.models import Author
-from following.models import Following
 
 '''
 class Register(GenericAPIView):
@@ -68,6 +67,9 @@ class GetAuthorApiView(GenericAPIView):
             return response.Response(result.data, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, user_id):
+        return response.Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def post(self, request, user_id):
         try:
