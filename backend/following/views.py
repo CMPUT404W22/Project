@@ -27,6 +27,7 @@ class GetFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class EditFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
@@ -55,11 +56,11 @@ class EditFollowersApiView(GenericAPIView):
         # check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
         try:
             author = Author.objects.get(id=user_id)
-            unfollower = Author.objects.get(id=foreign_user_id)
+            isFollower = Author.objects.get(id=foreign_user_id)
             followers = Following.objects.filter(following=author)
             if followers:
                 for follower in followers:
-                    if follower.author == unfollower:
+                    if follower.author == isFollower:
                         return response.Response("True", status.HTTP_200_OK)
 
             return response.Response("False", status.HTTP_200_OK)
