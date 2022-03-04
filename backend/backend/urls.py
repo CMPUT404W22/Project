@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_swagger.views import get_swagger_view
+schema_view = get_swagger_view(title='API Doc')
+
 
 import author
 from backend import settings
@@ -23,11 +26,12 @@ from backend import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('service/authors/', include("author.urls")),
+    path('service/authors/<str:user_id>/posts/', include("post.urls")),
     path('service/authors/<str:user_id>/posts/<str:post_id>/comments', include("comment.urls")),
     path('service/following/', include("following.urls")),
     # path('service/image/', include("image.urls")),
     path('service/like/', include("like.urls")),
     path('service/notification/', include("notification.urls")),
-    path('service/authors/<str:user_id>/posts/', include("post.urls")),
+    path('swagger/', schema_view),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
