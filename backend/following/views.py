@@ -1,11 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-
-# Create your views here.
+from .models import Following
+from django.views import generic
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
-
 from author.models import Author
 from following.models import Following
 
@@ -58,11 +57,53 @@ class EditFollowersApiView(GenericAPIView):
             author = Author.objects.get(id=user_id)
             isFollower = Author.objects.get(id=foreign_user_id)
             followers = Following.objects.filter(following=author)
-            if followers:
-                for follower in followers:
-                    if follower.author == isFollower:
-                        return response.Response("True", status.HTTP_200_OK)
-
+            for follower in followers:
+                if follower.author == isFollower:
+                    return response.Response("True", status.HTTP_200_OK)
             return response.Response("False", status.HTTP_200_OK)
         except Exception as e:
             return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
+
+# TODO: delete if unused
+class GetFollowingApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+
+    def get(self, request, user_id):
+        # gets a list of authors who are user_id's followers
+        try:
+            author = Author.objects.get(id=user_id)
+            following = Following.objects.filter(author=author)
+            result = {
+                "type": "following",
+                "items": [user.author.toJson() for user in following]
+            }
+            return response.Response(result, status.HTTP_200_OK)
+
+        except Exception as e:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+# TODO: delete if unused
+class EditFollowingApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+
+    def delete(self, request, user_id, foreign_user_id):
+        # remove FOREIGN_AUTHOR_ID as a follower of AUTHORs_ID
+        try:
+            author = Author.objects.get(id=user_id)
+            following = Author.objects.get(id=foreign_user_id)
+            record = Following.objects.get(author=author, following=following)
+            record.delete()
+            return response.Response("Deleted", status.HTTP_200_OK)
+        except Exception as e:
+            return response.Response("Error while trying to delete", status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, user_id, foreign_user_id):
+        # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
+        try:
+            author = Author.objects.get(id=user_id)
+            following = Author.objects.get(id=foreign_user_id)
+            Following.objects.create(author=author, following=following)
+            return response.Response("Added", status.HTTP_200_OK)
+        except Exception as e:
+            return response.Response("Error while trying to add", status=status.HTTP_404_NOT_FOUND)
+
