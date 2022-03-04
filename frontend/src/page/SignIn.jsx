@@ -26,11 +26,7 @@ function SignIn(prop) {
      * Sign in
      */
     function signIn() {
-        AuthProvider.signIn(
-            username,
-            password,
-            (resp) => {setFailed(true)},
-            () => {})
+        AuthProvider.signIn(username, password);
     }
     // endregion
 
