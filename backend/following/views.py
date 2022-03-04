@@ -1,7 +1,5 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from .models import Following
-from django.views import generic
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
