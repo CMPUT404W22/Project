@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.core.paginator import Paginator
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
@@ -21,6 +22,22 @@ class Register(GenericAPIView):
 
         return response.Response(str(new_user), status=status.HTTP_200_OK)
 '''
+
+
+class Login(GenericAPIView):
+    authentication_classes = []
+    serializer_class = AuthorSerializer
+
+    def post(self, request):
+        username = request.data["username"]
+        password = request.data["password"]
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            return response.Response(self.serializer_class(user, many=False).data, status=status.HTTP_200_OK)
+        else:
+            return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class GetAuthorsApiView(GenericAPIView):
