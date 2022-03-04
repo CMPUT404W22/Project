@@ -2,10 +2,11 @@ import React, {useState} from "react";
 
 import {Button, Card, Container, Placeholder} from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import { Typography } from "@material-ui/core";
+import { Typography, Tooltip, IconButton } from "@material-ui/core";
+import EditIcon from '@material-ui/icons/Edit';
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
-import contentStyles from "./classContent";
+import contentStyles from "./styles/classContent";
 import axios from "axios";
 
 
@@ -20,10 +21,10 @@ function Home(prop) {
     };
 
     try {
-        const res = axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts`, config)
+        axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts`, config)
             .then(function (res){
               let _data = res.data.items
-              console.log("read:",_data)
+              // console.log("read:",_data)
               setCardInfo(_data)
             });
         
@@ -34,6 +35,11 @@ function Home(prop) {
     const renderCard = (card, index) => {
         return (
             <Card style = {{margin: '30px'}} key = {index}>
+              <Tooltip title="Edit or Delete Post" style={{ position: 'absolute', right: 5, top: 5 }}>
+                <IconButton component={Link} to={`/post/edit`}>
+                  <EditIcon className={classesContent.block} color="primary"/>
+                </IconButton>
+              </Tooltip>
               <Card.Body>
                 <h3>{card.title}</h3>
                 <Card.Text>Author: {card.author.displayName}</Card.Text>
