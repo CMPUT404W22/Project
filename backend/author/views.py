@@ -3,8 +3,8 @@ from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 
+from author.serializer import AuthorSerializer
 from author.models import Author
-from following.models import Following
 
 '''
 class Register(GenericAPIView):
@@ -25,6 +25,7 @@ class Register(GenericAPIView):
 
 class GetAuthorsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = AuthorSerializer
 
     def get(self, request):
         users = Author.objects.all()
@@ -42,14 +43,14 @@ class GetAuthorsApiView(GenericAPIView):
 
             result = {
                 "type": "authors",
-                "items": [user.toJson() for user in page_obj]
+                "items": self.serializer_class(page_obj, many=True).data
             }
 
             return response.Response(result, status=status.HTTP_200_OK)
         else:
             result = {
                 "type": "authors",
-                "items": [user.toJson() for user in users]
+                "items": self.serializer_class(users, many=True).data
             }
 
             return response.Response(result, status=status.HTTP_200_OK)
@@ -57,14 +58,18 @@ class GetAuthorsApiView(GenericAPIView):
 
 class GetAuthorApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = AuthorSerializer
 
     def get(self, request, user_id):
         try:
             user = Author.objects.get(id=user_id)
-
-            return response.Response(user.toJson(), status=status.HTTP_200_OK)
+            result = self.serializer_class(user, many=False)
+            return response.Response(result.data, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, user_id):
+        return response.Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def post(self, request, user_id):
         try:

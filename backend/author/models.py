@@ -1,13 +1,9 @@
-import json
-import os
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.db import models
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 
 class MyUserManager(UserManager):
@@ -49,14 +45,3 @@ class Author(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         # created = not self.pk
         super().save(*args, **kwargs)
-
-    def toJson(self):
-        return {
-            "type": "author",
-            "id": f"http://127.0.0.1:8000/authors/{self.id}",
-            "url": f"http://127.0.0.1:8000/authors/{self.id}",
-            "host": "http://127.0.0.1:8000/",
-            "displayName": self.display_name,
-            "github": self.github,
-            "profileImage": self.image
-        }

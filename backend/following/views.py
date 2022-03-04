@@ -26,6 +26,7 @@ class GetFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class EditFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
@@ -38,7 +39,7 @@ class EditFollowersApiView(GenericAPIView):
             record.delete()
             return response.Response("Deleted", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to delete", status=status.HTTP_404_NOT_FOUND)
+            return response.Response(f"Error while trying to delete: {e}", status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, user_id, foreign_user_id):
         # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
@@ -48,21 +49,20 @@ class EditFollowersApiView(GenericAPIView):
             Following.objects.create(author=follower, following=author)
             return response.Response("Added", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to add", status=status.HTTP_404_NOT_FOUND)
+            return response.Response(f"Error while trying to add: {e}", status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, user_id, foreign_user_id):
         # check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
         try:
             author = Author.objects.get(id=user_id)
-            unfollower = Author.objects.get(id=foreign_user_id)
+            isFollower = Author.objects.get(id=foreign_user_id)
             followers = Following.objects.filter(following=author)
             for follower in followers:
-                if follower.author == unfollower:
+                if follower.author == isFollower:
                     return response.Response("True", status.HTTP_200_OK)
-
             return response.Response("False", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to get followers", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
 
 # TODO: delete if unused
 class GetFollowingApiView(GenericAPIView):

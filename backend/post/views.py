@@ -4,10 +4,13 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 
 from author.models import Author
+from post.serializer import PostSerializer
 from post.models import Post
+
 
 class GetPostsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = PostSerializer
 
     def get(self, request, user_id):
 
@@ -26,22 +29,22 @@ class GetPostsApiView(GenericAPIView):
 
             result = {
                 "type": "posts",
-                "items": [post.toJson() for post in page_obj]
+                "items": self.serializer_class(page_obj, many=True).data
             }
 
             return response.Response(result, status=status.HTTP_200_OK)
         else:
             result = {
                 "type": "posts",
-                "items": [post.toJson() for post in post]
+                "items": self.serializer_class(post, many=True).data
             }
 
             return response.Response(result, status=status.HTTP_200_OK)
-    
+
     def post(self, request, user_id):
-        author = Author.objects.get(id = user_id)
+        author = Author.objects.get(id=user_id)
         try:
-            post = Post.objects.create(author = author)
+            post = Post.objects.create(author=author)
             title = request.data["title"]
             description = request.data["description"]
             content = request.data["content"]
@@ -55,21 +58,24 @@ class GetPostsApiView(GenericAPIView):
             post.content = content
             post.visibility = visibility
             post.categories = categories
-            post.count = count
             post.unlisted = unlisted
             post.save()
-            
+
             return response.Response(post.toJson(), status=status.HTTP_201_CREATED)
         except Exception:
             return response.Response("Error", status=status.HTTP_400_BAD_REQUEST)
 
+
 class GetPostApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
+    serializer_class = PostSerializer
 
     def get(self, request, user_id, post_id):
         try:
-            post = Post.objects.get(id = post_id)
-            return response.Response(post.toJson(), status=status.HTTP_200_OK)
+            post = Post.objects.get(id=post_id)
+            result = self.serializer_class(post, many=False).data
+
+            return response.Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -91,7 +97,6 @@ class GetPostApiView(GenericAPIView):
                 post.content = content
                 post.visibility = visibility
                 post.categories = categories
-                post.count = count
                 post.unlisted = unlisted
                 post.save()
 
@@ -100,11 +105,11 @@ class GetPostApiView(GenericAPIView):
                 return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self, request, user_id, post_id):
         try:
             post = Post.objects.get(id=post_id)
             post.delete()
-            return response.Response("Deleted", status.HTTP_200_OK)
+            return response.Response("Deleted", status.HTTP_202_ACCEPTED)
         except Exception:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
