@@ -40,7 +40,7 @@ class EditFollowersApiView(GenericAPIView):
             record.delete()
             return response.Response("Deleted", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to delete", status=status.HTTP_404_NOT_FOUND)
+            return response.Response(f"Error while trying to delete: {e}", status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, user_id, foreign_user_id):
         # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
@@ -50,7 +50,7 @@ class EditFollowersApiView(GenericAPIView):
             Following.objects.create(author=follower, following=author)
             return response.Response("Added", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to add", status=status.HTTP_404_NOT_FOUND)
+            return response.Response(f"Error while trying to add: {e}", status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, user_id, foreign_user_id):
         # check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
@@ -65,36 +65,4 @@ class EditFollowersApiView(GenericAPIView):
 
             return response.Response("False", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to get followers", status=status.HTTP_400_BAD_REQUEST)
-
-
-class FollowingApiView(GenericAPIView):
-    authentication_classes = [BasicAuthentication, ]
-
-    def get(self, request):
-        pass
-
-
-def test(request, author_username):
-    followers = Following.objects.all()
-    return HttpResponse(str(followers))
-
-
-def addFollower(request):
-    # 'service/authors/{AUTHOR_ID}/addFollower/'
-    pass
-
-
-def removeFollower(request):
-    # 'service/authors/{AUTHOR_ID}/removeFollower/'
-    pass
-
-
-def addFollowing():
-    # 'service/authors/{AUTHOR_ID}/addFollowing/'
-    pass
-
-
-def removeFollowing():
-    # 'service/authors/{AUTHOR_ID}/removeFollowing/'
-    pass
+            return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
