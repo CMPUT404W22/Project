@@ -17,7 +17,7 @@ import SignUp from "./page/SignUp";
 import NotFound404 from "./page/NotFound404";
 import PrivateRoute from "./auth/PrivateRoute";
 import UserProfile from "./page/UserProfile";
-
+import CreatePost from './page/CreatePost';
 
 // css
 import './global.css';
@@ -66,6 +66,9 @@ ReactDOM.render(
                 <Route exact path='/inbox' element={<PrivateRoute/>}>
                     <Route exact path='/inbox' element={<Inbox/>}/>
                 </Route>
+                
+                <Route exact path='/post/create_post' element={<CreatePost/>}/>
+
                 {/* endregion */}
 
                 <Route path="*" element={<NotFound404/>}/>
