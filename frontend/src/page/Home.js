@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
 import {Button, Card, Container, Placeholder} from "react-bootstrap";
 import { Link } from 'react-router-dom';
@@ -20,17 +20,23 @@ function Home(prop) {
       }
     };
 
-    try {
-        axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts`, config)
+    useEffect(() => {
+      const fetchUser = async () => {
+          try {
+            axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts`, config)
             .then(function (res){
               let _data = res.data.items
               // console.log("read:",_data)
               setCardInfo(_data)
-            });
-        
-    } catch (error) {
-        console.error(error)
+     
+             });
+             } catch (error) {
+                 console.log(error.message);
+                 
+             }
       }
+      fetchUser();
+    }, []);
 
     const renderCard = (card, index) => {
         return (
