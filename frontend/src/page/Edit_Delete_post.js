@@ -15,7 +15,7 @@ let identity = Identity.GetIdentity();
 function EditPost(props) {
     const [username, setUsername] = useState(identity.username);
     const [userID, setUserID] = useState("732ea04f-20ed-431c-90b4-342195bf74c8");
-    const [postID, setPostID] = useState("b760609a-c57d-4b36-8a8f-20f530647fe8")
+    const [postID, setPostID] = useState("ad521bc1-48b2-48eb-b2be-f987e6e6cbe8")
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("")
     const [visibility, setVisibility] = useState(0)
@@ -27,6 +27,14 @@ function EditPost(props) {
             'Content-Type': 'application/json'
         }
     };
+
+    const auth = {
+        auth: {
+            username: identity.username,
+            password: identity.password
+          }
+
+    }
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -62,7 +70,7 @@ function EditPost(props) {
         try {
             console.log("start")
             console.log("data", data)
-            await axios.post(`http://127.0.0.1:8000/service/authors/${userID}/posts/${postID}`, data, config)
+            await axios.post(`http://127.0.0.1:8000/service/authors/${userID}/posts/${postID}`, data, auth, config)
             console.log("Success!")
             setOpen(true)
     
