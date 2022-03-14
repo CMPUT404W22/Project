@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from notification.models import Notification
+from author.serializer import AuthorSerializer
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,12 +10,19 @@ class NotificationSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
-        representation['type'] = "inbox"
-        representation['author'] = f"http://127.0.0.1:8000/authors/{instance.author}"
-        representation['url'] = f"http://127.0.0.1:8000/authors/{instance.id}"
-        representation['host'] = "http://127.0.0.1:8000/"
-        representation['displayName'] = instance.display_name
-        representation['github'] = instance.github
-        representation['profileImage'] = instance.image
-
+        representation['type'] = "post"
+        representation['title'] = instance.title
+        representation['id'] = f'http://127.0.0.1:8000/authors/{instance.author.id}/posts/{instance.post.id}'
+        representation['source'] = instance.source
+        representation['source'] = instance.origin
+        representation['description'] = instance.description
+        representation['contentType'] = instance.contentType
+        representation['content'] = instance.content
+        representation['author'] = AuthorSerializer(instance.get_author(), many=False).data
+        representation['content'] = instance.categories
+        representation['comments'] = f'http://127.0.0.1:5454/authors/{instance.author.id}/posts/{instance.post.id}/comments'
+        representation['published'] = instance.published
+        representation['visibility'] = instance.visibility
+        representation['unlisted'] = instance.unlisted
+        
         return representation
