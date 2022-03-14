@@ -50,7 +50,7 @@ class GetPostsApiView(GenericAPIView):
             content = request.data["content"]
             visibility = request.data["visibility"]
             categories = request.data["categories"]
-            count = request.data["count"]
+            # count = request.data["count"]
             unlisted = request.data["unlisted"]
 
             post.title = title
@@ -61,7 +61,8 @@ class GetPostsApiView(GenericAPIView):
             post.unlisted = unlisted
             post.save()
 
-            return response.Response(post.toJson(), status=status.HTTP_201_CREATED)
+            result = self.serializer_class(post, many=False)
+            return response.Response(result.data, status=status.HTTP_201_CREATED)
         except Exception:
             return response.Response("Error", status=status.HTTP_400_BAD_REQUEST)
 
@@ -88,7 +89,7 @@ class GetPostApiView(GenericAPIView):
                 content = request.data["content"]
                 visibility = request.data["visibility"]
                 categories = request.data["categories"]
-                count = request.data["count"]
+                # count = request.data["count"]
                 unlisted = request.data["unlisted"]
 
                 post = Post.objects.get(id=post_id)
@@ -100,7 +101,8 @@ class GetPostApiView(GenericAPIView):
                 post.unlisted = unlisted
                 post.save()
 
-                return response.Response(post.toJson(), status=status.HTTP_204_NO_CONTENT)
+                result = self.serializer_class(post, many=False)
+                return response.Response(result.data, status=status.HTTP_204_NO_CONTENT)
             else:
                 return response.Response(status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:

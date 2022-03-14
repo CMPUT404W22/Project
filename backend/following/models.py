@@ -18,6 +18,9 @@ class Following(models.Model):
         else:
             raise Exception("Authors cannot follow themselves")
 
+    def get_author(self):
+        return Author.objects.get(id=self.author.id)
+
     def __str__(self):
         return f"{self.author} is following ({self.following})"
 

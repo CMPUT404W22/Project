@@ -45,3 +45,6 @@ class Author(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         # created = not self.pk
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.display_name} {self.id}"

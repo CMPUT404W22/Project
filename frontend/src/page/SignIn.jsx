@@ -5,7 +5,7 @@ import {Button, Card, Container, Form, InputGroup, Modal, Toast, ToastContainer}
 import {Link} from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 
 import {AuthProvider} from "../auth/AuthProvider";
 
@@ -26,11 +26,7 @@ function SignIn(prop) {
      * Sign in
      */
     function signIn() {
-        AuthProvider.signIn(
-            username,
-            password,
-            (resp) => {setFailed(true)},
-            () => {})
+        AuthProvider.signIn(username, password);
     }
     // endregion
 
@@ -77,12 +73,12 @@ function SignIn(prop) {
                     <Card.Title>Sign in to your account</Card.Title>
                     <Form>
                         <Form.Group className="mb-3" controlId="formBasicUsername">
-                            <Form.Label>Email</Form.Label>
+                            <Form.Label>Username</Form.Label>
                             <InputGroup>
                                 <InputGroup.Text>
-                                    <FontAwesomeIcon icon={faEnvelope}/>
+                                    <FontAwesomeIcon icon={faUser}/>
                                 </InputGroup.Text>
-                                <Form.Control type="email" placeholder="Email Address"
+                                <Form.Control type="username" placeholder="Username"
                                               onChange={(e) => setUsername(e.target.value)} required/>
                             </InputGroup>
                         </Form.Group>
@@ -127,9 +123,9 @@ function SignIn(prop) {
                                     <Form.Label>Email Address</Form.Label>
                                     <InputGroup>
                                         <InputGroup.Text>
-                                            <FontAwesomeIcon icon={faEnvelope}/>
+                                            <FontAwesomeIcon icon={faUser}/>
                                         </InputGroup.Text>
-                                        <Form.Control type="email" placeholder="Enter email"
+                                        <Form.Control type="username" placeholder="Enter username"
                                                       onChange={(e) => setForgotPasswordEmail(e.target.value)}/>
                                     </InputGroup>
                                 </Form.Group>
