@@ -4,14 +4,13 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import response, status
 from author.models import Author
 from post.models import Post
-from following.models import Following
 from like.models import LikePost
 from like.models import LikeComment
 from comment.models import Comment
 from notification.models import Notification
-from backend.post.serializer import PostSerializer
-from backend.like.serializer import LikePostSerializer, LikeCommentSerializer
-from backend.comment.serializer import CommentSerializer
+from post.serializer import PostSerializer
+from like.serializer import LikePostSerializer, LikeCommentSerializer
+from comment.serializer import CommentSerializer
 
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
