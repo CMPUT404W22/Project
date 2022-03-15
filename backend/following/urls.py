@@ -1,16 +1,7 @@
 from django.urls import path
-
-from following import views
-
-url_base = 'service/authors'
+from following import views as followingViews
 
 urlpatterns = [
-    #path('authors/<str:author_username>/following', views.Followers.as_view(), name='get-followers'),
-    #path('author/<str:author_username>', views.FollowersApiView.as_view(), name='get-followers'),
-    #path('author/<str:author_username>/<str:foreign_author_id>', views.FollowersApiView.as_view(), name = "delete-follower")
-    #path('{url_base}/{AUTHOR_ID}/following/', views.index, name='main-view'),
-    #path('{url_base}/{AUTHOR_ID}/addFollower/', views.index, name='main-view'),
-    #path('{url_base}/{AUTHOR_ID}/removeFollower/', views.index, name='main-view'),
-    #path('{url_base}/{AUTHOR_ID}/addFollowing/', views.index, name='main-view'),
-    #path('{url_base}/{AUTHOR_ID}/removeFollowing/', views.index, name='main-view'),
+    path('<str:user_id>/followers', followingViews.GetFollowersApiView.as_view(), name="get follower"),
+    path('<str:user_id>/followers/<str:foreign_user_id>', followingViews.EditFollowersApiView.as_view(), name="edit follower"),
 ]

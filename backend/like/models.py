@@ -8,7 +8,7 @@ from comment.models import Comment
 
 
 class LikePost(models.Model):
-    like_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    like_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(Author, blank=False, null=False, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, blank=False, null=False, on_delete=models.CASCADE)
     summary = models.TextField(blank=False, null=False)
@@ -21,11 +21,10 @@ class LikePost(models.Model):
         return Author.objects.get(id=self.author.id)
 
     def __str__(self):
-        return f"{self.author} liked ({self.post})"
-
+        return f"like_id {self.like_id}: author {self.author} liked ({self.post})"
 
 class LikeComment(models.Model):
-    like_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    like_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(Author, blank=False, null=False, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, blank=False, null=False, on_delete=models.CASCADE)
     summary = models.TextField(blank=False, null=False)
@@ -38,5 +37,5 @@ class LikeComment(models.Model):
         return Author.objects.get(id=self.author.id)
 
     def __str__(self):
-        return f"{self.author} liked ({self.comment})"
+        return f"like_id {self.like_id}: author {self.author} liked ({self.comment})"
 
