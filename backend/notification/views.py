@@ -11,6 +11,7 @@ from notification.models import Notification
 from post.serializer import PostSerializer
 from like.serializer import LikePostSerializer, LikeCommentSerializer
 from comment.serializer import CommentSerializer
+from following.serializer import FollowRequestModel, FollowRequestSerializer
 
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
@@ -21,27 +22,29 @@ class NotificationsApiView(GenericAPIView):
         # gets a list of authors who are user_id's followers
 
         author = Author.objects.get(id=user_id)
-        notifications = Notification.objects.filter(author=author)        
+        notifications = Notification.objects.filter(author=author)
+
         try:
-
-
             items = list()
 
             for n in notifications:
                 result = None
                 if n.notification_type == "post":
-                    post = Post.objects.filter(id=n.notification_id)
+                    post = Post.objects.get(id=n.notification_id)
                     result = PostSerializer(post, many=False)
-                elif n.notification_type != "follow":
-                    pass
-                elif n.notification_type != "like_post":
-                    like = LikePost.objects.filter(like_id=n.notification_id)
+                elif n.notification_type == "follow":
+                    followerRequest = Author.objects.get(id=n.notifcation_id)
+                    author = Author.objects.get(id=n.notification_id)
+                    instance = FollowRequestModel(followerRequest, author)
+                    result = FollowRequestSerializer(instance, many=False)
+                elif n.notification_type == "like_post":
+                    like = LikePost.objects.get(like_id=n.notification_id)
                     result = LikePostSerializer(like, many=False)
-                elif n.notification_type != "like_comment":
-                    like = LikeComment.objects.filter(like_id=n.notification_id)
+                elif n.notification_type == "like_comment":
+                    like = LikeComment.objects.get(like_id=n.notification_id)
                     result = LikeCommentSerializer(like, many=False)
-                elif n.notification_type != "comment":
-                    comment = Comment.objects.filter(id=n.notification_id)
+                elif n.notification_type == "comment":
+                    comment = Comment.objects.get(id=n.notification_id)
                     result = CommentSerializer(comment, many=False)
                 else:
                     return response.Response(f"Error getting notifcations, invalid notifcation {n} saved in DB", status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -49,19 +52,20 @@ class NotificationsApiView(GenericAPIView):
 
             result = {
                 "type": "inbox",
-                "items": [i.content.toJson() for i in items]
+                "items": [i.data for i in items]
             }
             return response.Response(result, status.HTTP_200_OK)
 
         except Exception as e:
-            return response.Response(f"Failed to get notifications: {e}, {notifications[0]}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Failed to get notifications: {e}", status=status.HTTP_400_BAD_REQUEST)
 
+    # if notification_type is "follow", let notifcation_id be the id of the new follower's user id
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
             notifcation = Notification.objects.create(author=author)
-            notification_type = request.query_params['type']
-            notifcation_id = request.query_params['id']
+            notification_type = request.data['type']
+            notifcation_id = request.data['id']
 
             if(notification_type != "post" and notification_type != "follow" and
             notification_type != "like_post" and  notification_type != "like_comment" and notification_type != "comment"):
