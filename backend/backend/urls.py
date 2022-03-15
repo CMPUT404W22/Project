@@ -42,6 +42,7 @@ urlpatterns = [
     path('service/authors/<str:user_id>/posts/', include("post.urls")),
     path('service/authors/<str:user_id>/posts/<str:post_id>/comments', include("comment.urls")),
     path('service/authors/<str:user_id>/posts/<str:post_id>/likes', include("like.urls")),
+    path('service/authors/', include("following.urls")),
     path('service/authors/', include("notification.urls")),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
