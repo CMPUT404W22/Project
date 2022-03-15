@@ -20,8 +20,6 @@ class NotificationsApiView(GenericAPIView):
     post_serializer = PostSerializer
 
     def get(self, request, user_id):
-        # gets a list of authors who are user_id's followers
-
         author = Author.objects.get(id=user_id)
         notifications = Notification.objects.filter(author=author)
 
@@ -59,7 +57,6 @@ class NotificationsApiView(GenericAPIView):
         except Exception as e:
             return response.Response(f"Failed to get notifications: {e}", status=status.HTTP_400_BAD_REQUEST)
 
-    # if notification_type is "follow", let notifcation_id be the id of the new follower's user id
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
