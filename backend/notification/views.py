@@ -8,10 +8,11 @@ from like.models import LikePost
 from like.models import LikeComment
 from comment.models import Comment
 from notification.models import Notification
+from following.models import FollowRequest
 from post.serializer import PostSerializer
 from like.serializer import LikePostSerializer, LikeCommentSerializer
 from comment.serializer import CommentSerializer
-from following.serializer import FollowRequestModel, FollowRequestSerializer
+from following.serializer import FollowRequestSerializer
 
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
@@ -27,16 +28,15 @@ class NotificationsApiView(GenericAPIView):
         try:
             items = list()
 
+            n: Notification
             for n in notifications:
                 result = None
                 if n.notification_type == "post":
                     post = Post.objects.get(id=n.notification_id)
                     result = PostSerializer(post, many=False)
-                elif n.notification_type == "follow":
-                    followerRequest = Author.objects.get(id=n.notifcation_id)
-                    author = Author.objects.get(id=n.notification_id)
-                    instance = FollowRequestModel(followerRequest, author)
-                    result = FollowRequestSerializer(instance, many=False)
+                elif n.notification_type == "follow_request":
+                    followRequest = FollowRequest.objects.get(id=n.notification_id)
+                    result = FollowRequestSerializer(followRequest, many=False)
                 elif n.notification_type == "like_post":
                     like = LikePost.objects.get(like_id=n.notification_id)
                     result = LikePostSerializer(like, many=False)
@@ -67,7 +67,7 @@ class NotificationsApiView(GenericAPIView):
             notification_type = request.data['type']
             notifcation_id = request.data['id']
 
-            if(notification_type != "post" and notification_type != "follow" and
+            if(notification_type != "post" and notification_type != "follow_request" and
             notification_type != "like_post" and  notification_type != "like_comment" and notification_type != "comment"):
                 return response.Response(f"Post Inbox Error: Invalid notifcation type: {notification_type}", status=status.HTTP_400_BAD_REQUEST)
 
