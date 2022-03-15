@@ -19,9 +19,11 @@ class NotificationsApiView(GenericAPIView):
 
     def get(self, request, user_id):
         # gets a list of authors who are user_id's followers
+
+        author = Author.objects.get(id=user_id)
+        notifications = Notification.objects.filter(author=author)        
         try:
-            author = Author.objects.get(id=user_id)
-            notifications = Notification.objects.filter(author=author)
+
 
             items = list()
 
@@ -38,7 +40,7 @@ class NotificationsApiView(GenericAPIView):
                 elif n.notification_type != "like_comment":
                     like = LikeComment.objects.filter(like_id=n.notification_id)
                     result = LikeCommentSerializer(like, many=False)
-                elif notification_type != "comment":
+                elif n.notification_type != "comment":
                     comment = Comment.objects.filter(id=n.notification_id)
                     result = CommentSerializer(comment, many=False)
                 else:
@@ -52,26 +54,25 @@ class NotificationsApiView(GenericAPIView):
             return response.Response(result, status.HTTP_200_OK)
 
         except Exception as e:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Failed to get notifications: {e}, {notifications[0]}", status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
-
         try:
             notifcation = Notification.objects.create(author=author)
-            notifcation_type = request.data["type"]
-            notifcation_id = request.data["id"]
+            notification_type = request.query_params['type']
+            notifcation_id = request.query_params['id']
 
-            if(notification_type != "post" or notification_type != "follow" or
-            notification_type != "like_post" or  notification_type != "like_comment" or notification_type != "comment"):
-                return response.Response(f"Post Inbox Error: Invalid notifcation type", status=status.HTTP_400_BAD_REQUEST)
+            if(notification_type != "post" and notification_type != "follow" and
+            notification_type != "like_post" and  notification_type != "like_comment" and notification_type != "comment"):
+                return response.Response(f"Post Inbox Error: Invalid notifcation type: {notification_type}", status=status.HTTP_400_BAD_REQUEST)
 
-            notifcation.notifcation_type = notifcation_type
+            notifcation.notification_type = notification_type
             notifcation.notification_id = notifcation_id
+            notifcation.save()
             return response.Response("Added notification", status=status.HTTP_201_CREATED)
-
         except Exception as e:
-            return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Failed to post to inbox: {e}, {request.query_params}", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id):
         try:
