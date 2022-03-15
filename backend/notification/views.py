@@ -45,7 +45,7 @@ class NotificationsApiView(GenericAPIView):
                     comment = Comment.objects.get(id=n.notification_id)
                     result = CommentSerializer(comment, many=False)
                 else:
-                    return response.Response(f"Error getting notifcations, invalid notifcation {n} saved in DB", status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return response.Response(f"Error getting notifcations, invalid notifcation {n} saved in the DB", status.HTTP_500_INTERNAL_SERVER_ERROR)
                 items.append(result)
 
             result = {
@@ -60,7 +60,7 @@ class NotificationsApiView(GenericAPIView):
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
-            notifcation = Notification.objects.create(author=author)
+            notifcation: Notification = Notification.objects.create(author=author)
             notification_type = request.data['type']
             notifcation_id = request.data['id']
 
@@ -73,7 +73,7 @@ class NotificationsApiView(GenericAPIView):
             notifcation.save()
             return response.Response("Added notification", status=status.HTTP_201_CREATED)
         except Exception as e:
-            return response.Response(f"Failed to post to inbox: {e}, {request.query_params}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id):
         try:
