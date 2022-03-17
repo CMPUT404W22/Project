@@ -26,6 +26,7 @@ class PostSerializer(serializers.ModelSerializer):
         representation['published'] = instance.updated
         representation['visibility'] = instance.visibility
         representation['unlisted'] = instance.unlisted
+        representation['image'] = instance.image
 
         return representation
 
