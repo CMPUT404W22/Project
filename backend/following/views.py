@@ -3,7 +3,8 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 from author.models import Author
 from author.serializer import AuthorSerializer
-from following.models import Following
+from following.models import Following, FollowRequest
+from following.serializer import FollowRequestSerializer
 
 
 class GetFollowersApiView(GenericAPIView):
@@ -25,7 +26,6 @@ class GetFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 class EditFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
     serializer_class = AuthorSerializer
@@ -35,8 +35,7 @@ class EditFollowersApiView(GenericAPIView):
         try:
             follower = Author.objects.get(id=foreign_user_id)
             author = Author.objects.get(id=user_id)
-            record = Following.objects.get(author=follower, following=author)
-            record.delete()
+            Following.objects.filter(author=follower, following=author).delete()
             return response.Response("Deleted", status.HTTP_202_ACCEPTED)
         except Exception as e:
             return response.Response(f"Error while trying to delete: {e}", status=status.HTTP_404_NOT_FOUND)
@@ -47,6 +46,7 @@ class EditFollowersApiView(GenericAPIView):
             author = Author.objects.get(id=user_id)
             follower = Author.objects.get(id=foreign_user_id)
             Following.objects.create(author=follower, following=author)
+            Following.save()
             return response.Response("Added", status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Error while trying to add: {e}", status=status.HTTP_404_NOT_FOUND)
@@ -64,49 +64,43 @@ class EditFollowersApiView(GenericAPIView):
         except Exception as e:
             return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
 
-
-# TODO: delete if unused
-class GetFollowingApiView(GenericAPIView):
-    authentication_classes = [BasicAuthentication, ]
-    serializer_class = AuthorSerializer
-
+class FollowRequestApiView(GenericAPIView):
     def get(self, request, user_id):
-        # gets a list of authors who are user_id's followers
         try:
             author = Author.objects.get(id=user_id)
-            following = Following.objects.filter(author=author)
+            follow_requests = FollowRequest.objects.filter(author).get()
+            items = list()
+
+            for fr in follow_requests:
+                items.append(FollowRequestSerializer(fr))
+
             result = {
-                "type": "following",
-                "items": [user.author.toJson() for user in following]
+                "type": "Follow Requests",
+                "items": [i.data for i in items]
             }
             return response.Response(result, status.HTTP_200_OK)
-
         except Exception as e:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Error while trying to get list of follower requests: {e}", status=status.HTTP_400_BAD_REQUEST)
 
-# TODO: delete if unused
-class EditFollowingApiView(GenericAPIView):
-    authentication_classes = [BasicAuthentication, ]
-    serializer_class = AuthorSerializer
+    def post(self, request, user_id, foreign_user_id):
+        # note: we assume user_id is the author who wants to send a follow request to author of foreign_user_id
+        # Requesting author has id user_id
+        # Author receiving the follow request has id foreign_user_id
+
+        try:
+            requesting_author = Author.objects.get(id=user_id)
+            receiving_author = Author.objects.get(id=foreign_user_id)
+            FollowRequest.objects.create(author=receiving_author, requesting_author=requesting_author)
+            FollowRequest.save()
+            return response.Response("Follow request sent", status.HTTP_200_OK)
+        except Exception as e:
+            return response.Response(f"Error while trying to add a follower request: {e}", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, foreign_user_id):
-        # remove FOREIGN_AUTHOR_ID as a follower of AUTHORs_ID
         try:
             author = Author.objects.get(id=user_id)
-            following = Author.objects.get(id=foreign_user_id)
-            record = Following.objects.get(author=author, following=following)
-            record.delete()
-            return response.Response("Deleted", status.HTTP_200_OK)
+            requesting_author = Author.objects.get(id=foreign_user_id)
+            FollowRequest.objects.filter(author, requesting_author).delete()
+            return response.Response("Follow request successfully deleted", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response("Error while trying to delete", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, user_id, foreign_user_id):
-        # Add FOREIGN_AUTHOR_ID as follower of AUTHOR_ID
-        try:
-            author = Author.objects.get(id=user_id)
-            following = Author.objects.get(id=foreign_user_id)
-            Following.objects.create(author=author, following=following)
-            return response.Response("Added", status.HTTP_200_OK)
-        except Exception as e:
-            return response.Response("Error while trying to add", status=status.HTTP_404_NOT_FOUND)
-
+            return response.Response(f"Error while trying to delete follower request: {e}", status=status.HTTP_400_BAD_REQUEST)
