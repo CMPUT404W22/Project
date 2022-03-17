@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import {Button, Card, Container, Placeholder} from "react-bootstrap";
-import { Link } from 'react-router-dom';
-
+import { useLocation } from 'react-router-dom'
 import axios from "axios";
 import CardBody from "./styles/cardBody";
 import GridContainer from "./styles/GridContainer";
@@ -13,9 +12,10 @@ import Identity from "../model/Identity";
 
 let identity = Identity.GetIdentity();
 function EditPost(props) {
+    const location = useLocation();
     const [username, setUsername] = useState(identity.username);
     const [userID, setUserID] = useState("732ea04f-20ed-431c-90b4-342195bf74c8");
-    const [postID, setPostID] = useState("ad521bc1-48b2-48eb-b2be-f987e6e6cbe8")
+    const [postID, setPostID] = useState("")
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("")
     const [visibility, setVisibility] = useState(0)
@@ -39,10 +39,13 @@ function EditPost(props) {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                await axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts/${postID}`, config)
+                let pathName = location.pathname;
+                let post_id = pathName.split("/").pop();
+                await axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts/${post_id}`, config, auth)
                .then(function (response){
                    let _data = response.data
-                   // console.log("read:",_data)
+                   setPostID(post_id)
+                //    console.log("read:",postID)
                    setTitle(_data.title)
                    setContent(_data.content)
                    setDescription(_data.description)
@@ -74,7 +77,7 @@ function EditPost(props) {
             console.log("Success!")
             setOpen(true)
     
-           window.history.back("/home")
+            window.location.href = `/home`
         } catch (error) {
             console.log(error.message);
             setOpen(true)

@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.db.models import CharField, Model
 from django_mysql.models import ListCharField
+from django.utils.translation import gettext_lazy as _
 
 from author.models import Author
 
@@ -29,8 +30,9 @@ class Post(models.Model):
     content = models.TextField(blank=True, null=True)
     visibility = models.IntegerField(default=Visibility.PUBLIC, choices=Visibility.choices)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    updated = models.DateTimeField(auto_now_add=True, editable=False)
+    updated = models.DateTimeField(auto_now=True, editable=False)
     unlisted = models.BooleanField(default=False)
+    image = models.CharField(_('post image'), max_length=300, blank=True, null=True)
     categories = ListCharField(
         null=True,
         base_field=CharField(max_length=10),

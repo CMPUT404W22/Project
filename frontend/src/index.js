@@ -69,7 +69,7 @@ ReactDOM.render(
                 </Route>
                 
                 <Route exact path='/post/create_post' element={<CreatePost/>}/>
-                <Route exact path='/post/edit' element={<EditPost/>}/>
+                <Route exact path='/post/:post_id' element={<EditPost/>}/>
                 {/* endregion */}
 
                 <Route path="*" element={<NotFound404/>}/>
