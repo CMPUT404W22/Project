@@ -4,6 +4,7 @@ from author.models import Author
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
+from django.test import TestCase
 
 
 class CommentTestCase(APITestCase):
@@ -46,3 +47,7 @@ class CommentTestCase(APITestCase):
         response = self.client.get(f'/service/authors/{self.id}/posts/{self.id}/comments')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.comment.id, self.id)
+        
+    def test_post_comment(self):
+        pass
+        

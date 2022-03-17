@@ -36,13 +36,27 @@ class FollowersTestCase(APITestCase):
             unlisted = False,
             categories = "Nice"
         )
+        self.Image_Post = {
+            "id" : self.foreignId1,
+            "author" : self.author1,
+            "type" : 3,
+            "title" : "ImgTitle",
+            "description" : "ImgDescription",
+            "content" : "Nice Image!",
+            "visibility" : 0,
+            "unlisted" : False,
+            "image" : "Here is image",
+            "categories" : "Img"
+        }
+        
+
 
         # Authenticate user
         self.client = APIClient()
         self.client.login(username='test1', password='password')
 
     def test_get_post(self):
-        # test getting/creating/updating/posting posts
+        # test getting posts
         response = self.client.get(f'/service/authors/{self.id}/posts/{self.id}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.post.id, self.id)
@@ -54,6 +68,9 @@ class FollowersTestCase(APITestCase):
         self.assertEqual(self.post.visibility, 0)
         self.assertEqual(self.post.unlisted, False)
         self.assertEqual(self.post.categories, "Nice")
+
+    def test_post_post(self):
+        pass
 
     def test_delete_posts(self):
         # test deleting a post
