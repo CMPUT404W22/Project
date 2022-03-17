@@ -19,13 +19,13 @@ class LikesTestCase(APITestCase):
 
         # get the ids of the users
         self.authorname1 = Author.objects.get(username="user1")
-        self.foreignId1 = self.author1.id
+        self.foreignId1 = self.authorname1.id
 
         self.authorname2 = Author.objects.get(username="user2")
-        self.foreignId2 = self.author2.id
+        self.foreignId2 = self.authorname2.id
 
         self.username = Author.objects.get(username="test1")
-        self.id = self.user.id
+        self.id = self.username.id
 
         # Authenticate users
         self.user = APIClient()
