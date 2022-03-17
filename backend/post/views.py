@@ -52,6 +52,7 @@ class GetPostsApiView(GenericAPIView):
             categories = request.data["categories"]
             # count = request.data["count"]
             unlisted = request.data["unlisted"]
+            image = request.data["image"]
 
             post.title = title
             post.description = description
@@ -59,6 +60,7 @@ class GetPostsApiView(GenericAPIView):
             post.visibility = visibility
             post.categories = categories
             post.unlisted = unlisted
+            post.image = image
             post.save()
 
             result = self.serializer_class(post, many=False)
@@ -91,6 +93,7 @@ class GetPostApiView(GenericAPIView):
                 categories = request.data["categories"]
                 # count = request.data["count"]
                 unlisted = request.data["unlisted"]
+                image = request.data["image"]
 
                 post = Post.objects.get(id=post_id)
                 post.title = title
@@ -99,6 +102,7 @@ class GetPostApiView(GenericAPIView):
                 post.visibility = visibility
                 post.categories = categories
                 post.unlisted = unlisted
+                post.image = image
                 post.save()
 
                 result = self.serializer_class(post, many=False)

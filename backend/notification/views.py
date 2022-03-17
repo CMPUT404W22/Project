@@ -22,6 +22,7 @@ class NotificationsApiView(GenericAPIView):
     def get(self, request, user_id):
         author = Author.objects.get(id=user_id)
         notifications = Notification.objects.filter(author=author)
+        notifications.order_by('-created')
 
         try:
             items = list()
