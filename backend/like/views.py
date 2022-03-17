@@ -53,10 +53,11 @@ class GetLikedApiView(GenericAPIView):
         # gets posts and comment objects that the author likes
         try:
             author = Author.objects.get(id=user_id)
-            likedPost = LikePost.objects.filter(author=author)
-            likedComment = LikeComment.objects.filter(author=author)
-            combinedList = list(chain(likedPost, likedComment))
-            return response.Response(self.serializer_class_post(combinedList, many=True).data, status=status.HTTP_200_OK)
+            liked_post = LikePost.objects.filter(author=author)
+            liked_comment = LikeComment.objects.filter(author=author)
 
+            result = self.serializer_class_post(liked_post, many=True).data + self.serializer_class_comment(liked_comment, many=True).data
+
+            return response.Response(self.serializer_class_post(result, many=True).data, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(f"Error: {e}", status.HTTP_400_BAD_REQUEST)
