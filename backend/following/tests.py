@@ -40,7 +40,7 @@ class FollowersTestCase(APITestCase):
     def test_put_and_delete_followers(self):
         # testing adding a follower
         response = self.client.put(f'/service/authors/{self.id}/followers/{self.foreignId1}')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.content, b'"Added"')
 
         # check that it was added to the database
@@ -50,7 +50,7 @@ class FollowersTestCase(APITestCase):
 
         # test delete
         response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreignId1}')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         self.assertEqual(response.content, b'"Deleted"')
 
         # check that it was removed from the database

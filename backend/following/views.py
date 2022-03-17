@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from .models import Following
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
@@ -11,14 +9,16 @@ from following.models import Following
 class GetFollowersApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
     serializer_class = AuthorSerializer
+
     def get(self, request, user_id):
         # gets a list of authors who are user_id's followers
         try:
             author = Author.objects.get(id=user_id)
-            followers = Following.objects.filter(following=author)
+            followers = [x.author for x in Following.objects.filter(following=author)]
+
             result = {
                 "type": "followers",
-                "items": AuthorSerializer(followers, many=True)
+                "items": AuthorSerializer(followers, many=True).data
             }
             return response.Response(result, status.HTTP_200_OK)
 
