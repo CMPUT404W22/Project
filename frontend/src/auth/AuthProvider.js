@@ -19,6 +19,9 @@ const AuthProvider = {
             "service/authors/login/",
             {username: username, password: password}
         ).then(function (response) {
+            let url = response.data.id
+            let lastSegment = url.split("/").pop()
+            console.log("user: ", lastSegment)
             AuthProvider.Identity = new Identity(username, password, "user");
             AuthProvider.Identity.StoreIdentity();
 
