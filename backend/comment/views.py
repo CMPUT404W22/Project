@@ -61,6 +61,7 @@ class GetCommentsApiView(GenericAPIView):
             comment.type = type
             comment.save()
 
-            return response.Response(comment.toJson(), status=status.HTTP_201_CREATED)
+            result = self.serializer_class(comment, many=False)
+            return response.Response(result.data, status=status.HTTP_201_CREATED)
         except Exception:
             return response.Response("Error", status=status.HTTP_400_BAD_REQUEST)

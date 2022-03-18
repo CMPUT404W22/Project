@@ -1,10 +1,9 @@
-from ast import Import
-from urllib import response
 from post.models import Post
 from author.models import Author
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
+
 
 
 class FollowersTestCase(APITestCase):
@@ -36,9 +35,10 @@ class FollowersTestCase(APITestCase):
             unlisted = False,
             categories = "Nice"
         )
+        # image post
         self.Image_Post = {
-            "id" : self.foreignId1,
-            "author" : self.author1,
+            "id" : self.id,
+            "author" : self.id,
             "type" : 3,
             "title" : "ImgTitle",
             "description" : "ImgDescription",
@@ -48,8 +48,6 @@ class FollowersTestCase(APITestCase):
             "image" : "Here is image",
             "categories" : "Img"
         }
-        
-
 
         # Authenticate user
         self.client = APIClient()
@@ -70,7 +68,9 @@ class FollowersTestCase(APITestCase):
         self.assertEqual(self.post.categories, "Nice")
 
     def test_post_post(self):
-        pass
+        request = self.Image_Post
+        response = self.client.post(f'/service/authors/{self.id}/posts/', request)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_delete_posts(self):
         # test deleting a post
@@ -83,14 +83,24 @@ class FollowersTestCase(APITestCase):
         response = self.client.delete(f'/service/authors/{self.id}/posts/{self.foreignId1}')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_invalid_put(self):
-        # test when uses an id that is not valid
-        invalidId = "123"
-        response = self.client.delete(f'/service/authors/{self.id}/posts/{invalidId}')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_invalid_get(self):
         # test when uses an id that is not valid
         invalidId = "123"
         response = self.client.delete(f'/service/authors/{self.id}/posts/{invalidId}')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_invalid_post(self):
+        Invalid_Post = {
+            "id" : "33333",
+            "author" : "3333333",
+            "type" : "2333",
+            "title" : "ImgTitle",
+            "description" : "ImgDescription",
+            "content" : "Nice Image!",
+            "visibility" : "not",
+            "unlisted" : False,
+            "image" : "Here is image",
+            "categories" : "Img"
+        }
+        response = self.client.post(f'/service/authors/{self.foreignId1}/posts/', Invalid_Post)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
