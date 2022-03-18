@@ -2,31 +2,42 @@ from author.models import Author
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-
+import uuid
 
 class AuthorTestCase(APITestCase):
 
     def setUp(self):
         # create users
-        Author.objects.create_user(username="test1", password="password",
-                                   display_name="test1", github="0")
-
-        Author.objects.create_user(username="user1", password="password",
-                                   display_name="user1", github="1")
-
-        Author.objects.create_user(username="user2", password="password",
-                                   display_name="user2", github="2")
-
-        # get the ids of the users
-        self.author1 = Author.objects.get(username="user1")
-        self.foreignId1 = self.author1.id
-
-        self.author2 = Author.objects.get(username="user2")
-        self.foreignId2 = self.author2.id
-
-        self.user = Author.objects.get(username="test1")
-        self.id = self.user.id
-
+        self.author = Author.objects.create(
+            id = uuid.uuid4(),
+            username = "user",
+            display_name = "display Name",
+            github = "github0"
+        )
+        
+        self.id = self.author.id
+        
+        self.post_author = {
+            "displayName" : "user1",
+            "github" : "3",
+            "profileImage" : "image"
+        }
+        
         # Authenticate user
         self.client = APIClient()
-        self.client.login(username='test1', password='password')
+        self.client.login(username='user', password='pswd')
+        
+    def test_get_author(self):
+        response = self.client.get(f'/service/authors/{self.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.author.id, self.id)
+        self.assertEqual(self.author.display_name, "display Name")
+        self.assertEqual(self.author.github, "github0")
+        
+    # def test_post_author(self):
+    #     request = self.post_author
+    #     self.client.post("/login/", {"username":"user","password":"pswd"})
+    #     response = self.client.post(f'/service/authors/{self.id}/', request)
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+  
