@@ -150,3 +150,4 @@ class LikesTestCase(APITestCase):
         response = self.user.get(f'/service/authors/{self.id}/posts/{post.id}/comments/{comment.id}/likes')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
