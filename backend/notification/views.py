@@ -16,6 +16,7 @@ from like.serializer import LikePostSerializer, LikeCommentSerializer
 from comment.serializer import CommentSerializer
 from following.serializer import FollowRequestSerializer
 
+
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
