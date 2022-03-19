@@ -46,7 +46,6 @@ class EditFollowersApiView(GenericAPIView):
             author = Author.objects.get(id=user_id)
             follower = Author.objects.get(id=foreign_user_id)
             Following.objects.create(author=follower, following=author)
-            Following.save()
             return response.Response("Added", status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Error while trying to add: {e}", status=status.HTTP_404_NOT_FOUND)
