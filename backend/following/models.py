@@ -37,7 +37,7 @@ class FollowRequest(models.Model):
         if self.author != self.requesting_author:
             return super().save(*args, **kwargs)
         else:
-            raise Exception("Authors cannot send a request to themselves")
+            raise Exception("Authors cannot send a follow request to themselves")
 
     def get_summary(self):
         return self.requesting_author.display_name + " wants to follow " + self.author.display_name

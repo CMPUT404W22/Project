@@ -5,7 +5,6 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 class FollowersTestCase(APITestCase):
-
     def setUp(self):
         # create users
         Author.objects.create_user(username="test1", password="password",
@@ -90,7 +89,6 @@ class FollowersTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class FollowRequestTestCase(APITestCase):
-
     def setUp(self):
         # create users
         Author.objects.create_user(username="user1", password="password",

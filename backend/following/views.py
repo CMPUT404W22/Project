@@ -79,7 +79,7 @@ class FollowRequestApiView(GenericAPIView):
             }
             return response.Response(result, status.HTTP_200_OK)
         except Exception as e:
-            return response.Response(f"Error while trying to get list of follower requests: {e}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Error while trying to get list of follow requests: {e}", status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, receiving_author_id, requesting_author_id):
         try:
@@ -88,7 +88,7 @@ class FollowRequestApiView(GenericAPIView):
             FollowRequest.objects.create(author=receiving_author, requesting_author=requesting_author)
             return response.Response("Follow request sent", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response(f"Error while trying to add a follower request: {e}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Error while trying to add a follow request: {e}", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, receiving_author_id, requesting_author_id):
         try:
@@ -97,4 +97,4 @@ class FollowRequestApiView(GenericAPIView):
             FollowRequest.objects.filter(author=receiving_author, requesting_author=requesting_author).delete()
             return response.Response("Follow request successfully deleted", status.HTTP_200_OK)
         except Exception as e:
-            return response.Response(f"Error while trying to delete follower request: {e}", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(f"Error while trying to delete follow request: {e}", status=status.HTTP_400_BAD_REQUEST)
