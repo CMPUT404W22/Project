@@ -117,7 +117,6 @@ class FollowRequestTestCase(APITestCase):
     def test_get_contents(self):
         # add data to DB
         # it should get a 200 OK response
-
         FollowRequest.objects.create(author=self.author1, requesting_author=self.author2)
         response = self.client.get(f'/service/authors/{self.author_id_1}/followerRequests')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
