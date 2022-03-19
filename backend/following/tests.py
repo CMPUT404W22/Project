@@ -1,4 +1,5 @@
 from author.models import Author
+from following.models import FollowRequest
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -87,3 +88,61 @@ class FollowersTestCase(APITestCase):
         invalidId = "123"
         response = self.client.delete(f'/service/authors/{self.id}/followers/{invalidId}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# class FollowRequestTestCase(APITestCase):
+
+#     def setUp(self):
+#         # create users
+#         Author.objects.create_user(username="user1", password="password",
+#                                    display_name="user1", github="1")
+
+#         Author.objects.create_user(username="user2", password="password",
+#                                    display_name="user2", github="2")
+
+#         # get the ids of the users
+#         self.author1 = Author.objects.get(username="user1")
+#         self.author_id_1 = self.author1.id
+
+#         self.author2 = Author.objects.get(username="user2")
+#         self.author_id_2 = self.author2.id
+
+#         # Authenticate
+#         self.client = APIClient()
+#         self.client.login(username='user1', password='password')
+
+#     def test_get_empty(self):
+#         # it should get a 200 OK response
+#         response = self.client.get(f'/service/authors/{self.author_id_1}/followerRequests')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(response.content, b'{"type":"follow requests","items":[]}')
+
+#     def test_get_contents(self):
+#         # add data to DB
+#         # it should get a 200 OK response
+
+#         FollowRequest.objects.create(author=self.author1, requesting_author=self.author2)
+#         FollowRequest.save()
+#         response = self.client.get(f'/service/authors/{self.author_id_1}/followers')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(response.content, b'{"type":"follow requests","items":[]}')
+
+    # def test_fail_get(self):
+    #     # it should send 400 BAD REQUEST response if author id is invalid
+    #     pass
+
+    # def test_post():
+    #     # it should create new database entry and send 200 OK response
+    #     pass
+
+    # def test_fail_post_invalid_author_id():
+    #     # it should fail if author id is invalid and send 400 BAD REQUEST
+    #     pass
+
+    # def test_delete():
+    #     # it should delete database entry and send 200 OK response
+    #     pass
+
+    # def test_fail_delete():
+    #     # it should fail if author id is invalid and send 400 BAD REQUEST
+    #     pass
