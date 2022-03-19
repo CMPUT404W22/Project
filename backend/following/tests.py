@@ -73,14 +73,15 @@ class FollowersTestCase(APITestCase):
         self.assertEqual(response.content, b'"False"')
 
     def test_invalid_delete(self):
-        # test when trying to delete follower that isnt in database
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreign_id1}')
+        # test when trying to delete follower that is not in database
+        invalid_id = "123"
+        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalid_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_invalid_put(self):
-        # test when uses an id that is not valid
+        # test when trying to delete follower that is not in database
         invalid_id = "123"
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalid_id}')
+        response = self.client.put(f'/service/authors/{self.id}/followers/{invalid_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_invalid_get(self):
