@@ -13,6 +13,7 @@ import axios from "axios";
 function Home(prop) {
     const classesContent = contentStyles();
     const [userID, setUserID] = useState("732ea04f-20ed-431c-90b4-342195bf74c8");
+    const [open, setOpen] = useState(false);
     const [cardInfo, setCardInfo] = useState([]);
     const config = {
       headers: {
@@ -23,7 +24,7 @@ function Home(prop) {
     useEffect(() => {
       const fetchUser = async () => {
           try {
-            axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts`, config)
+            axios.get(`http://127.0.0.1:8000/service/authors/${userID}/posts/`, config)
             .then(function (res){
               let _data = res.data.items
               // console.log("read:",_data)
@@ -38,11 +39,17 @@ function Home(prop) {
       fetchUser();
     }, []);
 
+    const handleSubmit = async (card, e) => {
+        let lastSegment = card.split("/").pop()
+        console.log("id", lastSegment)
+        window.location.href = `/post/${lastSegment}`
+    }
+
     const renderCard = (card, index) => {
         return (
             <Card style = {{margin: '30px'}} key = {index}>
               <Tooltip title="Edit or Delete Post" style={{ position: 'absolute', right: 5, top: 5 }}>
-                <IconButton component={Link} to={`/post/edit`}>
+                <IconButton onClick={() =>handleSubmit(card.id)}>
                   <EditIcon className={classesContent.block} color="primary"/>
                 </IconButton>
               </Tooltip>

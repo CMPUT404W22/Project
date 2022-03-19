@@ -23,6 +23,7 @@ class LikePost(models.Model):
     def __str__(self):
         return f"like_id {self.like_id}: author {self.author} liked ({self.post})"
 
+
 class LikeComment(models.Model):
     like_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(Author, blank=False, null=False, on_delete=models.CASCADE)

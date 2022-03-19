@@ -55,10 +55,10 @@ class EditFollowersApiView(GenericAPIView):
         # check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID
         try:
             author = Author.objects.get(id=user_id)
-            isFollower = Author.objects.get(id=foreign_user_id)
+            is_follower = Author.objects.get(id=foreign_user_id)
             followers = Following.objects.filter(following=author)
             for follower in followers:
-                if follower.author == isFollower:
+                if follower.author == is_follower:
                     return response.Response("True", status.HTTP_200_OK)
             return response.Response("False", status.HTTP_200_OK)
         except Exception as e:

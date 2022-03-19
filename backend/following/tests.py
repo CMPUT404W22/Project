@@ -20,10 +20,10 @@ class FollowersTestCase(APITestCase):
 
         # get the ids of the users
         self.author1 = Author.objects.get(username="user1")
-        self.foreignId1 = self.author1.id
+        self.foreign_id1 = self.author1.id
 
         self.author2 = Author.objects.get(username="user2")
-        self.foreignId2 = self.author2.id
+        self.foreign_id2 = self.author2.id
 
         self.user = Author.objects.get(username="test1")
         self.id = self.user.id
@@ -40,7 +40,7 @@ class FollowersTestCase(APITestCase):
 
     def test_put_and_delete_followers(self):
         # testing adding a follower
-        response = self.client.put(f'/service/authors/{self.id}/followers/{self.foreignId1}')
+        response = self.client.put(f'/service/authors/{self.id}/followers/{self.foreign_id1}')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.content, b'"Added"')
 
@@ -50,7 +50,7 @@ class FollowersTestCase(APITestCase):
         self.assertNotEqual(response.content, b'{"type":"followers","items":[]}')
 
         # test delete
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreignId1}')
+        response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreign_id1}')
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         self.assertEqual(response.content, b'"Deleted"')
 
@@ -61,32 +61,32 @@ class FollowersTestCase(APITestCase):
 
     def test_get_is_follower(self):
         # check when is a follower
-        self.client.put(f'/service/authors/{self.id}/followers/{self.foreignId2}')
-        response = self.client.get(f'/service/authors/{self.id}/followers/{self.foreignId2}')
+        self.client.put(f'/service/authors/{self.id}/followers/{self.foreign_id2}')
+        response = self.client.get(f'/service/authors/{self.id}/followers/{self.foreign_id2}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, b'"True"')
 
     def test_get_not_follower(self):
         # check when not a follower
-        response = self.client.get(f'/service/authors/{self.id}/followers/{self.foreignId1}')
+        response = self.client.get(f'/service/authors/{self.id}/followers/{self.foreign_id1}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, b'"False"')
 
     def test_invalid_delete(self):
         # test when trying to delete follower that isnt in database
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreignId1}')
+        response = self.client.delete(f'/service/authors/{self.id}/followers/{self.foreign_id1}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_invalid_put(self):
         # test when uses an id that is not valid
-        invalidId = "123"
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalidId}')
+        invalid_id = "123"
+        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalid_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_invalid_get(self):
         # test when uses an id that is not valid
-        invalidId = "123"
-        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalidId}')
+        invalid_id = "123"
+        response = self.client.delete(f'/service/authors/{self.id}/followers/{invalid_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 

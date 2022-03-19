@@ -6,6 +6,8 @@ from author.models import Author
 from post.models import Post
 from like.models import LikePost
 from like.models import LikeComment
+from like.views import save_like_post
+from like.views import save_like_comment
 from comment.models import Comment
 from notification.models import Notification
 from following.models import FollowRequest
@@ -22,6 +24,7 @@ class NotificationsApiView(GenericAPIView):
     def get(self, request, user_id):
         author = Author.objects.get(id=user_id)
         notifications = Notification.objects.filter(author=author)
+        notifications.order_by('-created')
 
         try:
             items = list()
@@ -60,17 +63,26 @@ class NotificationsApiView(GenericAPIView):
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
-            notifcation: Notification = Notification.objects.create(author=author)
+            notification: Notification = Notification.objects.create(author=author)
             notification_type = request.data['type']
-            notifcation_id = request.data['id']
+            notification_id = request.data['id']
 
             if(notification_type != "post" and notification_type != "follow_request" and
             notification_type != "like_post" and  notification_type != "like_comment" and notification_type != "comment"):
                 return response.Response(f"Post Inbox Error: Invalid notifcation type: {notification_type}", status=status.HTTP_400_BAD_REQUEST)
 
-            notifcation.notification_type = notification_type
-            notifcation.notification_id = notifcation_id
-            notifcation.save()
+            notification.notification_type = notification_type
+            notification.notification_id = notification_id
+            notification.save()
+
+            # saving like post and like comment to the database
+            if notification_type == "like_post":
+                post = Post.objects.get(id=notification_id)
+                save_like_post(author, post)
+            if notification_type == "like_comment":
+                comment = Comment.objects.get(id=notification_id)
+                save_like_comment(author, comment)
+
             return response.Response("Added notification", status=status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
