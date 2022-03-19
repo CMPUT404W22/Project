@@ -1,7 +1,11 @@
+import base64
+
 from django.core.paginator import Paginator
 from rest_framework import response, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
+from django.core.files.base import ContentFile
+
 
 from author.models import Author
 from post.serializer import PostSerializer
@@ -119,3 +123,20 @@ class GetPostApiView(GenericAPIView):
             return response.Response("Deleted", status.HTTP_202_ACCEPTED)
         except Exception:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetPostImageApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication, ]
+    serializer_class = PostSerializer
+
+    def get(self, request, author_id, post_id):
+        post = Post.objects.get(post_id=post_id)
+
+        if post.type == "image/png;base64" or post.type == "image/jpeg;base64":
+            format = "png" if "png" in post.type else "jpeg"
+            img_str = post.content
+
+            data = ContentFile(base64.b64decode(img_str), name='temp.' + format)  # You can save this as file instance.
+            return response.Response(data, status=status.HTTP_200_OK)
+        else:
+            return response.Response(status=status.HTTP_404_NOT_FOUND)
