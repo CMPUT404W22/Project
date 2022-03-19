@@ -67,8 +67,8 @@ class FollowRequestApiView(GenericAPIView):
     def get(self, request, author_id):
         try:
             author = Author.objects.get(id=author_id)
-            follow_requests = FollowRequest.objects.filter(author).get()
-            items = list()
+            follow_requests = FollowRequest.objects.filter(author=author)
+            items = []
 
             for fr in follow_requests:
                 items.append(FollowRequestSerializer(fr))
@@ -86,7 +86,6 @@ class FollowRequestApiView(GenericAPIView):
             receiving_author = Author.objects.get(id=receiving_author_id)
             requesting_author = Author.objects.get(id=requesting_author_id)
             FollowRequest.objects.create(author=receiving_author, requesting_author=requesting_author)
-            FollowRequest.save()
             return response.Response("Follow request sent", status.HTTP_200_OK)
         except Exception as e:
             return response.Response(f"Error while trying to add a follower request: {e}", status=status.HTTP_400_BAD_REQUEST)
