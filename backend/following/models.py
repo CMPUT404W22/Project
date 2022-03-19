@@ -33,6 +33,12 @@ class FollowRequest(models.Model):
     class Meta:
         unique_together = ('author', 'requesting_author',)
 
+    def save(self, *args, **kwargs):
+        if self.author != self.requesting_author:
+            return super().save(*args, **kwargs)
+        else:
+            raise Exception("Authors cannot send a follow request to themselves")
+
     def get_summary(self):
         return self.requesting_author.display_name + " wants to follow " + self.author.display_name
 

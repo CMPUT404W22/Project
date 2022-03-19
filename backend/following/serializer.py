@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from author.serializer import AuthorSerializer
-from author.models import Author
 from following.models import FollowRequest
 
 class FollowRequestSerializer(serializers.ModelSerializer):
