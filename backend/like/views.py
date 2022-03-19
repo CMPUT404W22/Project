@@ -48,10 +48,9 @@ class GetLikeCommentApiView(GenericAPIView):
 
     def get(self, request, user_id, post_id, comment_id):
         try:
-            comment = Comment.objects.get(id=comment_id)
+            post = Post.objects.get(id=post_id, author=user_id) # ensure that parameters passed are author's id, post id
+            comment = Comment.objects.get(id=comment_id, post_id=post.id)
             likes = LikeComment.objects.filter(comment=comment)
-            #comment = Notification.objects.filter(comment=comment_id, notification_type="like_comment")
-            #likes = LikeComment.objects.filter(comment=comment)
             return response.Response(self.serializer_class(likes, many=True).data, status=status.HTTP_200_OK)
 
         except Exception as e:
