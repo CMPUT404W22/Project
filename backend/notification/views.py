@@ -16,7 +16,6 @@ from like.serializer import LikePostSerializer, LikeCommentSerializer
 from comment.serializer import CommentSerializer
 from following.serializer import FollowRequestSerializer
 
-
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
@@ -28,29 +27,11 @@ class NotificationsApiView(GenericAPIView):
         notifications.order_by('-created')
 
         try:
-            items = list()
+            items = []
 
             n: Notification
             for n in notifications:
-                result = None
-                if n.notification_type == "post":
-                    post = Post.objects.get(id=n.notification_id)
-                    result = PostSerializer(post, many=False)
-                elif n.notification_type == "follow_request":
-                    followRequest = FollowRequest.objects.get(id=n.notification_id)
-                    result = FollowRequestSerializer(followRequest, many=False)
-                elif n.notification_type == "like_post":
-                    like = LikePost.objects.get(like_id=n.notification_id)
-                    result = LikePostSerializer(like, many=False)
-                elif n.notification_type == "like_comment":
-                    like = LikeComment.objects.get(like_id=n.notification_id)
-                    result = LikeCommentSerializer(like, many=False)
-                elif n.notification_type == "comment":
-                    comment = Comment.objects.get(id=n.notification_id)
-                    result = CommentSerializer(comment, many=False)
-                else:
-                    return response.Response(f"Error getting notifcations, invalid notifcation {n} saved in the DB", status.HTTP_500_INTERNAL_SERVER_ERROR)
-                items.append(result)
+                items.append(n.content)
 
             result = {
                 "type": "inbox",
@@ -64,26 +45,8 @@ class NotificationsApiView(GenericAPIView):
     def post(self, request, user_id):
         author = Author.objects.get(id=user_id)
         try:
-            notification: Notification = Notification.objects.create(author=author)
-            notification_type = request.data['type']
-            notification_id = request.data['id']
-
-            if(notification_type != "post" and notification_type != "follow_request" and
-            notification_type != "like_post" and  notification_type != "like_comment" and notification_type != "comment"):
-                return response.Response(f"Post Inbox Error: Invalid notifcation type: {notification_type}", status=status.HTTP_400_BAD_REQUEST)
-
-            notification.notification_type = notification_type
-            notification.notification_id = notification_id
-            notification.save()
-
-            # saving like post and like comment to the database
-            if notification_type == "like_post":
-                post = Post.objects.get(id=notification_id)
-                save_like_post(author, post)
-            if notification_type == "like_comment":
-                comment = Comment.objects.get(id=notification_id)
-                save_like_comment(author, comment)
-
+            content = request.data['content']
+            Notification.objects.create(author=author, content=content)
             return response.Response("Added notification", status=status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
