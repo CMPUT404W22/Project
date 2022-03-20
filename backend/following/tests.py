@@ -1,7 +1,6 @@
 from author.models import Author
 from following.models import FollowRequest
-from rest_framework.test import APITestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 
 class FollowersTestCase(APITestCase):
