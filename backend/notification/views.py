@@ -3,23 +3,36 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework import response, status
 from author.models import Author
-from post.models import Post
-from like.models import LikePost
-from like.models import LikeComment
-from like.views import save_like_post
-from like.views import save_like_comment
-from comment.models import Comment
 from notification.models import Notification
-from following.models import FollowRequest
-from post.serializer import PostSerializer
-from like.serializer import LikePostSerializer, LikeCommentSerializer
-from comment.serializer import CommentSerializer
-from following.serializer import FollowRequestSerializer
+from post.models import Post
+from comment.models import Comment
+from like.views import save_like_post, save_like_comment
+import json
+
+def parse_contents(author, content):
+    # convert contents to json and parse for LIKE objects
+    # if contents is a LIKE, add to LikeComment/LikePost database
+    data_json = json.loads(content)
+
+    if(data_json["type"] != "Like"):
+        return
+
+    summary: str = data_json["summary"]
+    object_url = data_json["object"].split('/')
+    last_index = len(object_url) - 1
+
+    if('post' in summary.lower()):
+        post = Post.objects.get(id=object_url[last_index])
+        save_like_post(author, post)
+    elif('comment' in summary.lower()):
+        comment = Comment.objects.get(id=object_url[last_index])
+        save_like_comment(author, comment)
+    else:
+        raise Exception(f"Invalid summary {summary}")
 
 # Create your views here.
 class NotificationsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
-    post_serializer = PostSerializer
 
     def get(self, request, user_id):
         author = Author.objects.get(id=user_id)
@@ -47,6 +60,7 @@ class NotificationsApiView(GenericAPIView):
         try:
             content = request.data['content']
             Notification.objects.create(author=author, content=content)
+            parse_contents(author, content)
             return response.Response("Added notification", status=status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
