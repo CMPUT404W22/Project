@@ -131,7 +131,7 @@ class FollowRequestTestCase(APITestCase):
     def test_post(self):
         # it should create new database entry and send 200 OK response
         response = self.client.post(f'/service/authors/{self.author_id_1}/followerRequests/{self.author_id_2}')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.content, b'"Follow request sent"')
 
     def test_fail_post(self):
