@@ -35,20 +35,19 @@ class NotificationsApiView(GenericAPIView):
     authentication_classes = [BasicAuthentication, ]
 
     def get(self, request, user_id):
-        author = Author.objects.get(id=user_id)
-        notifications = Notification.objects.filter(author=author)
-        notifications.order_by('-created')
-
         try:
+            author = Author.objects.get(id=user_id)
+            notifications = Notification.objects.filter(author=author)
+            notifications.order_by('-created')
+
             items = []
 
-            n: Notification
             for n in notifications:
                 items.append(n.content)
 
             result = {
                 "type": "inbox",
-                "items": [i.data for i in items]
+                "items": [i for i in items]
             }
             return response.Response(result, status.HTTP_200_OK)
 
@@ -56,8 +55,8 @@ class NotificationsApiView(GenericAPIView):
             return response.Response(f"Failed to get notifications: {e}", status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, user_id):
-        author = Author.objects.get(id=user_id)
         try:
+            author = Author.objects.get(id=user_id)
             content = request.data['content']
             Notification.objects.create(author=author, content=content)
             parse_contents(author, content)
