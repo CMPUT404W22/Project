@@ -45,6 +45,38 @@ class LikesTestCase(APITestCase):
         self.author2 = APIClient()
         self.author2.login(username='test1', password='password')
 
+        self.like_post_content = ''' {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "summary": "Lara Croft Likes your post",         
+            "type": "Like",
+            "author":{
+                "type":"author",
+                "id":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "host":"http://127.0.0.1:5454/",
+                "displayName":"Lara Croft",
+                "url":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "github":"http://github.com/laracroft",
+                "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
+            },
+            "object":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/%s"
+        }'''
+
+        self.like_comment_content = ''' {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            "summary": "Lara Croft Likes your comment",         
+            "type": "Like",
+            "author":{
+                "type":"author",
+                "id":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "host":"http://127.0.0.1:5454/",
+                "displayName":"Lara Croft",
+                "url":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+                "github":"http://github.com/laracroft",
+                "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
+            },
+            "object":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/%s"
+        }'''
+
     def create_post(self, author_name):
         post = Post.objects.create(
             id=uuid.uuid4(),
@@ -74,8 +106,8 @@ class LikesTestCase(APITestCase):
 
         #author2 likes users post
         post = self.create_post(self.username)
-        like_data = {"type": "like_post", "id": post.id}
-        self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', like_data, format='json')
+        like_post = {"content": self.like_post_content % str(post.id)}
+        self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', like_post, format='json')
 
         #get the list of people who liked users post
         response = self.user.get(f'/service/authors/{self.id}/posts/{post.id}/likes', format='json')
@@ -89,7 +121,7 @@ class LikesTestCase(APITestCase):
         comment = self.create_comment(self.authorname1, post)
 
         # author2 and user likes author1's comment
-        like_data = {"type": "like_comment", "id": comment.id}
+        like_data = {"content": self.like_comment_content % str(comment.id)}
         with transaction.atomic():
             self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', like_data, format='json')
             self.user.post(f'/service/authors/{self.id}/inbox', like_data, format='json')
@@ -102,7 +134,7 @@ class LikesTestCase(APITestCase):
     def test_liked(self):
         # tests getting a list of likes originating from the author
         post = self.create_post(self.authorname2)
-        like_data = {"type": "like_post", "id": post.id}
+        like_data = {"content": self.like_post_content % str(post.id)}
         # have user like author2 post
         self.user.post(f'/service/authors/{self.id}/inbox', like_data, format='json')
         # have author1 like author2 post
@@ -118,8 +150,8 @@ class LikesTestCase(APITestCase):
         comment2 = self.create_comment(self.authorname2, post)
 
         # have user like author1's comment
-        like_comment = {"type": "like_comment", "id": comment.id}
-        like_comment2 = {"type": "like_comment", "id": comment2.id}
+        like_comment = {"content": self.like_comment_content % str(comment.id)}
+        like_comment2 = {"content": self.like_comment_content % str(comment2.id)}
         self.user.post(f'/service/authors/{self.id}/inbox', like_comment, format='json')
         self.user.post(f'/service/authors/{self.id}/inbox', like_comment2, format='json')
 
