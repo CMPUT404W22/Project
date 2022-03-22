@@ -14,9 +14,7 @@ class NotificationTestCase(APITestCase):
         self.author: Author = Author.objects.get(username="user1")
         self.author_id = self.author.id
 
-        self.request = {
-            "content": '''{"type": "Post"}'''
-        }
+        self.request = {"type": "Post"}
 
         # Authenticate
         self.client = APIClient()

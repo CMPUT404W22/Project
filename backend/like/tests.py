@@ -10,7 +10,7 @@ from notification.models import Notification
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-
+import copy
 
 class LikesTestCase(APITestCase):
 
@@ -45,7 +45,9 @@ class LikesTestCase(APITestCase):
         self.author2 = APIClient()
         self.author2.login(username='test1', password='password')
 
-        self.like_post_content = ''' {
+        self.object_url = "http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/%s"
+
+        self.like_post_request_data = {
             "@context": "https://www.w3.org/ns/activitystreams",
             "summary": "Lara Croft Likes your post",         
             "type": "Like",
@@ -58,10 +60,9 @@ class LikesTestCase(APITestCase):
                 "github":"http://github.com/laracroft",
                 "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
             },
-            "object":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/%s"
-        }'''
+        }
 
-        self.like_comment_content = ''' {
+        self.like_comment_request_data = {
             "@context": "https://www.w3.org/ns/activitystreams",
             "summary": "Lara Croft Likes your comment",         
             "type": "Like",
@@ -74,8 +75,7 @@ class LikesTestCase(APITestCase):
                 "github":"http://github.com/laracroft",
                 "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
             },
-            "object":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/%s"
-        }'''
+        }
 
     def create_post(self, author_name):
         post = Post.objects.create(
@@ -106,8 +106,8 @@ class LikesTestCase(APITestCase):
 
         #author2 likes users post
         post = self.create_post(self.username)
-        like_post = {"content": self.like_post_content % str(post.id)}
-        self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', like_post, format='json')
+        self.like_post_request_data["object"] = self.object_url % str(post.id)
+        self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', self.like_post_request_data, format='json')
 
         #get the list of people who liked users post
         response = self.user.get(f'/service/authors/{self.id}/posts/{post.id}/likes', format='json')
@@ -121,10 +121,10 @@ class LikesTestCase(APITestCase):
         comment = self.create_comment(self.authorname1, post)
 
         # author2 and user likes author1's comment
-        like_data = {"content": self.like_comment_content % str(comment.id)}
+        self.like_comment_request_data["object"] = self.object_url % str(comment.id)        
         with transaction.atomic():
-            self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', like_data, format='json')
-            self.user.post(f'/service/authors/{self.id}/inbox', like_data, format='json')
+            self.author2.post(f'/service/authors/{self.foreign_id2}/inbox', self.like_comment_request_data, format='json')
+            self.user.post(f'/service/authors/{self.id}/inbox', self.like_comment_request_data, format='json')
 
             # get the people who liked the comment
             response = self.user.get(f'/service/authors/{self.id}/posts/{post.id}/comments/{comment.id}/likes')
@@ -134,11 +134,12 @@ class LikesTestCase(APITestCase):
     def test_liked(self):
         # tests getting a list of likes originating from the author
         post = self.create_post(self.authorname2)
-        like_data = {"content": self.like_post_content % str(post.id)}
+        
+        self.like_post_request_data["object"] = self.object_url %  str(post.id)
         # have user like author2 post
-        self.user.post(f'/service/authors/{self.id}/inbox', like_data, format='json')
+        self.user.post(f'/service/authors/{self.id}/inbox', self.like_post_request_data, format='json')
         # have author1 like author2 post
-        self.author1.post(f'/service/authors/{self.foreign_id1}/inbox', like_data, format='json')
+        self.author1.post(f'/service/authors/{self.foreign_id1}/inbox', self.like_post_request_data, format='json')
 
         # get the list of likes that user1 made
         response = self.user.get(f'/service/authors/{self.id}/liked')
@@ -150,8 +151,11 @@ class LikesTestCase(APITestCase):
         comment2 = self.create_comment(self.authorname2, post)
 
         # have user like author1's comment
-        like_comment = {"content": self.like_comment_content % str(comment.id)}
-        like_comment2 = {"content": self.like_comment_content % str(comment2.id)}
+        like_comment = copy.deepcopy(self.like_comment_request_data)
+        like_comment["object"] = self.object_url % str(comment.id)
+        like_comment2 = copy.deepcopy(self.like_comment_request_data)
+        like_comment2["object"] = self.object_url % str(comment2.id)
+        
         self.user.post(f'/service/authors/{self.id}/inbox', like_comment, format='json')
         self.user.post(f'/service/authors/{self.id}/inbox', like_comment2, format='json')
 
