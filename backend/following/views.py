@@ -86,7 +86,7 @@ class FollowRequestApiView(GenericAPIView):
             receiving_author = Author.objects.get(id=receiving_author_id)
             requesting_author = Author.objects.get(id=requesting_author_id)
             FollowRequest.objects.create(author=receiving_author, requesting_author=requesting_author)
-            return response.Response("Follow request sent", status.HTTP_200_OK)
+            return response.Response("Follow request sent", status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Error while trying to add a follow request: {e}", status=status.HTTP_400_BAD_REQUEST)
 

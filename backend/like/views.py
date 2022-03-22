@@ -8,9 +8,6 @@ from like.models import LikePost, LikeComment
 from like.serializer import LikePostSerializer, LikeCommentSerializer
 from post.models import Post
 from comment.models import Comment
-from notification.models import Notification
-from itertools import chain
-
 
 def save_like_post(author, post):
     like_post = LikePost.objects.create(author=author,post=post)
