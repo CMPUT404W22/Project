@@ -10,6 +10,8 @@ from author.models import Author
 from author.serializer import AuthorSerializer
 from comment.models import Comment
 from comment.serializer import CommentSerializer
+from like.models import LikePost, LikeComment
+from like.serializer import LikePostSerializer, LikeCommentSerializer
 from notification.models import Notification
 from post.models import Post
 from post.serializer import PostSerializer
@@ -77,12 +79,12 @@ class CheckFollowersApiView(GenericAPIView):
     def get(self, request, author_id, follower_id):
         try:
             author = Author.objects.get(id=author_id)
-            isFollower = Author.objects.get(id=follower_id)
+            is_follower = Author.objects.get(id=follower_id)
             followers = Following.objects.filter(following=author)
             for follower in followers:
-                if follower.author == isFollower:
-                    return response.Response("True", status.HTTP_200_OK)
-            return response.Response("False", status.HTTP_200_OK)
+                if follower.author == is_follower:
+                    return response.Response([self.serializer_class(is_follower, many=False).data], status.HTTP_200_OK)
+            return response.Response([], status.HTTP_200_OK)
         except Exception as e:
             return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
 # endregion
@@ -156,12 +158,55 @@ class GetCommentsApiView(GenericAPIView):
 
 
 # region likes
+class GetLikeApiView(GenericAPIView):
+    authentication_classes = []
+    serializer_class = LikePostSerializer
+
+    def get(self, request, author_id, post_id):
+        # gets a list of likes from other authors on AUTHOR_ID’s post POST_ID
+        try:
+            post = Post.objects.get(id=post_id, author=author_id)
+            likes = LikePost.objects.filter(post=post)
+            return response.Response(self.serializer_class(likes, many=True).data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return response.Response(f"Error occurred: {e}", status.HTTP_404_NOT_FOUND)
+
+
+class GetLikeCommentApiView(GenericAPIView):
+    authentication_classes = []
+    serializer_class = LikeCommentSerializer
+
+    def get(self, request, author_id, post_id, comment_id):
+        try:
+            # post = Post.objects.get(id=post_id, author=user_id) # ensure that parameters passed are author's id, post id
+            comment = Comment.objects.get(id=comment_id)
+            likes = LikeComment.objects.filter(comment=comment)
+            return response.Response(self.serializer_class(likes, many=True).data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return response.Response(f"Error occurred: {e}", status.HTTP_404_NOT_FOUND)
 
 # endregion
 
 
 # region liked
+class GetLikedApiView(GenericAPIView):
+    authentication_classes = [BasicAuthentication]
+    serializer_class_post = LikePostSerializer
+    serializer_class_comment = LikeCommentSerializer
 
+    def get(self, request, author_id):
+        try:
+            author = Author.objects.get(id=author_id)
+            liked_posts = LikePost.objects.filter(author=author)
+            liked_comments = LikeComment.objects.filter(author=author)
+            result = self.serializer_class_post(liked_posts, many=True).data + self.serializer_class_comment(
+                liked_comments, many=True).data
+            return response.Response(result, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return response.Response(f"Error: {e}", status.HTTP_404_NOT_FOUND)
 # endregion
 
 
@@ -173,21 +218,12 @@ class SendToInboxApiView(GenericAPIView):
     def post(self, request, author_id):
         author = Author.objects.get(id=author_id)
         try:
-            notification: Notification = Notification.objects.create(author=author)
-            notification_type = request.data['type']
-            notification_id = request.data['id']
+            notification = Notification.objects.create(author=author)
+            content = request.data['content']
 
-            if (notification_type != "post" and
-                    notification_type != "follow_request" and
-                    notification_type != "like_post"
-                    and notification_type != "like_comment"
-                    and notification_type != "comment"):
-                return response.Response(f"Post Inbox Error: Invalid notifcation type: {notification_type}", status=status.HTTP_400_BAD_REQUEST)
-
-            notification.notification_type = notification_type
-            notification.notification_id = notification_id
+            notification.content = content
             notification.save()
-            return response.Response("Added notification", status=status.HTTP_201_CREATED)
+            return response.Response("Notification Created", status=status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response(f"Failed to post to inbox: {e}", status=status.HTTP_400_BAD_REQUEST)
 

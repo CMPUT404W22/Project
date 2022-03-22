@@ -58,8 +58,8 @@ class EditFollowersApiView(GenericAPIView):
             followers = Following.objects.filter(following=author)
             for follower in followers:
                 if follower.author == is_follower:
-                    return response.Response("True", status.HTTP_200_OK)
-            return response.Response("False", status.HTTP_200_OK)
+                    return response.Response([self.serializer_class(is_follower, many=False).data], status.HTTP_200_OK)
+            return response.Response([], status.HTTP_200_OK)
         except Exception as e:
             return response.Response(f"Error while trying to get followers: {e}", status=status.HTTP_400_BAD_REQUEST)
 
